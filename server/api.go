@@ -31,7 +31,7 @@ func (s *Server) handleApi(c *routing.Context) error {
 
 	if promoType == "all" {
 		api.lock.Lock()
-		defer api.lock.RUnlock()
+		defer api.lock.Unlock()
 		return toJson(api, c.Response.BodyWriter())
 	}
 
@@ -66,8 +66,8 @@ func (api *Api) GetPromo(promoType, promoId string) (promo.Promo, error) {
 }
 
 func (api *Api) GetType(promoType string) (map[string]promo.Promo, error) {
-	api.lock.RLock()
-	defer api.lock.RLock()
+	api.lock.Lock()
+	defer api.lock.Unlock()
 
 	switch promoType {
 	case "servers":
