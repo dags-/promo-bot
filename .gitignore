@@ -6,5 +6,7 @@
 *.dylib
 *.gz
 
+*.iml
+*.xml
 .idea/
 test.go

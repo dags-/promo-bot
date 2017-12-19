@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"errors"
 	"github.com/dags-/promo-bot/github"
+	"strings"
 )
 
 func (s *Server) handleAppGet(c *routing.Context) error  {
@@ -33,8 +34,6 @@ func (s *Server) handleAppPost(c *routing.Context) error  {
 		return s.redirect(c)
 	}
 
-	s.auth.dropAuthentication(id) // disallow further posts for this session
-	s.auth.setRateLimited(id) // mark user as rate limited (can't post again for 30 mins)
 	var p promo.Promo
 
 	meta := promo.Meta{
@@ -45,6 +44,14 @@ func (s *Server) handleAppPost(c *routing.Context) error  {
 		Media: getString(c, "media"),
 		Discord: getString(c, "discord"),
 	}
+
+	err := validate(meta)
+	if err != nil {
+		return err
+	}
+
+	s.auth.dropAuthentication(id) // disallow further posts for this session
+	s.auth.setRateLimited(id) // mark user as rate limited (can't post again for 30 mins)
 
 	switch meta.Type {
 	case "server":
@@ -82,6 +89,30 @@ func (s *Server) handleAppPost(c *routing.Context) error  {
 	}
 
 	c.Redirect(result.URL, 302)
+
+	return nil
+}
+
+func validate(meta promo.Meta) (error) {
+	if meta.Name == "" {
+		return errors.New("Name is required")
+	}
+
+	if len(meta.Name) > 120 {
+		return errors.New("Name is too long")
+	}
+
+	if len(meta.Media) > 120 {
+		return errors.New("Media url is too long")
+	}
+
+	if len(meta.Description) > 240 {
+		return errors.New("Description is too long")
+	}
+
+	if len(meta.Discord) > 0 && !strings.HasSuffix(meta.Discord, "https://discord.gg/") {
+		return errors.New("Invalid discord join link")
+	}
 
 	return nil
 }
