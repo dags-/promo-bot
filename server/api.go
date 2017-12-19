@@ -25,28 +25,19 @@ func newApi(repo github.Repo) Api {
 }
 
 func (s *Server) handleApi(c *routing.Context) error {
-	s.api.lock.Lock()
-	defer s.api.lock.Unlock()
-
+	api := s.api
 	promoType := c.Param("type")
 	promoId := c.Param("id")
 
-	var promos map[string]promo.Promo
+	if promoType == "all" {
+		api.lock.Lock()
+		defer api.lock.RUnlock()
+		return toJson(api, c.Response.BodyWriter())
+	}
 
-	switch promoType {
-	case "servers":
-		promos = s.api.Servers
-		break
-	case "youtubers":
-		promos = s.api.Youtubers
-		break
-	case "twitchers":
-		promos = s.api.Twitchers
-		break
-	case "all":
-		return toJson(s.api, c.Response.BodyWriter())
-	default:
-		return errors.New("Invalid roote, try `/servers` `/youtubers` `/twitchers`")
+	promos, err := api.GetType(promoType)
+	if err != nil {
+		return err
 	}
 
 	if promoId != "" {
@@ -59,6 +50,35 @@ func (s *Server) handleApi(c *routing.Context) error {
 	}
 
 	return toJson(promos, c.Response.BodyWriter())
+}
+
+func (api *Api) GetPromo(promoType, promoId string) (promo.Promo, error) {
+	promos, err := api.GetType(promoType)
+	if err != nil {
+		return nil, err
+	}
+
+	if pr, ok := promos[promoId]; ok {
+		return pr, nil
+	}
+
+	return nil, errors.New("Promotion for id not found")
+}
+
+func (api *Api) GetType(promoType string) (map[string]promo.Promo, error) {
+	api.lock.RLock()
+	defer api.lock.RLock()
+
+	switch promoType {
+	case "servers":
+		return api.Servers, nil
+	case "youtubers":
+		return api.Youtubers, nil
+	case "twitchers":
+		return api.Twitchers, nil
+	default:
+		return nil, errors.New("Invalid promo type")
+	}
 }
 
 func (api *Api) tick() {

@@ -22,7 +22,7 @@ func (s *Server) handleAppGet(c *routing.Context) error  {
 	c.Response.Header.Set("Cache-Control", "no-cache, no-store, must-revalidate")
 	c.Response.Header.Set("Pragma", "no-cache")
 	c.Response.Header.Set("Expires", "0")
-	c.SendFile("html/index.html")
+	c.SendFile("docs/index.html")
 
 	return nil
 }

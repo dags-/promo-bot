@@ -13,6 +13,7 @@ import (
 
 const apiRoute = "/api/<type>"
 const apiIdRoute = "/api/<type>/<id>"
+const previewRoute = "/preview/<type>/<id>"
 const authRoute = "/auth"
 const promotionRoute = "/promotion"
 const promotionAuthRoute = "/promotion/<auth>"
@@ -44,6 +45,7 @@ func (s *Server) Start(port int) {
 	router := routing.New()
 	router.Get(apiRoute, s.handleApi)
 	router.Get(apiIdRoute, s.handleApi)
+	router.Get(previewRoute, s.handlePreview)
 	router.Get(authRoute, s.handleAuth)
 	router.Get(promotionRoute, s.redirect)
 	router.Get(promotionAuthRoute, s.handleAppGet)
