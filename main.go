@@ -16,6 +16,7 @@ func main() {
 	clientId := flag.String("clientId", "",  "Discord bot client id")
 	clientSecret := flag.String("clientSecret", "",  "Discord bot client secret")
 	redirectUri := flag.String("redirect", "",  "Discord bot redirect uri")
+	port := flag.Int("port", 8181, "The port to run the bot on")
 	flag.Parse()
 
 	if !checkFlag(ghtoken, "Github Token") {
@@ -39,7 +40,7 @@ func main() {
 	session := github.NewSession(*ghtoken)
 	rep := session.NewRepo(*owner, *repo)
 	s := server.NewServer(session, rep, *clientId, *clientSecret, *redirectUri)
-	s.Start(8181)
+	s.Start(*port)
 }
 
 func handleStop() {
