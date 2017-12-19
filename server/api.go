@@ -82,6 +82,9 @@ func (api *Api) GetType(promoType string) (map[string]promo.Promo, error) {
 }
 
 func (api *Api) tick() {
+	api.lock.Lock()
+	defer api.lock.Unlock()
+
 	contents, err := api.repo.GetContents()
 	if err != nil {
 		fmt.Println(err)
@@ -116,8 +119,6 @@ func (api *Api) tick() {
 		}
 	}
 
-	api.lock.Lock()
-	defer api.lock.Unlock()
 	api.Servers = servers
 	api.Youtubers = youtubers
 	api.Twitchers = twitchers

@@ -3,7 +3,6 @@ package server
 import (
 	"github.com/qiangxue/fasthttp-routing"
 	"github.com/dags-/promo-bot/github"
-	"sync"
 	"github.com/valyala/fasthttp"
 	"time"
 	"fmt"
@@ -19,7 +18,6 @@ const promotionRoute = "/promotion"
 const promotionAuthRoute = "/promotion/<auth>"
 
 type Server struct {
-	lock         sync.RWMutex
 	session      github.Session
 	repo         github.Repo
 	auth         AuthSessions
@@ -64,27 +62,18 @@ func (s *Server) Start(port int) {
 		MaxRequestBodySize: 0,
 	}
 
-	startApiThread(s)
-	startAuthThread(s)
+	go startServerLoop(s)
+
 	panic(server.ListenAndServe(fmt.Sprintf(":%v", port)))
 }
 
-func startApiThread(s *Server) {
-	go func() {
-		for {
-			s.api.tick()
-			time.Sleep(time.Duration(time.Minute * 30))
-		}
-	}()
-}
-
-func startAuthThread(s *Server) {
-	go func() {
-		for {
-			s.auth.tick()
-			time.Sleep(time.Duration(time.Minute * 15))
-		}
-	}()
+func startServerLoop(s *Server) {
+	sleep := time.Duration(time.Minute * 15)
+	for {
+		s.api.tick()
+		s.auth.tick()
+		time.Sleep(sleep)
+	}
 }
 
 func getString(c *routing.Context, key string) (string) {

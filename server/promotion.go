@@ -118,8 +118,6 @@ func validate(meta promo.Meta) (error) {
 }
 
 func (s *Server) submit(promo promo.Promo) (github.PRResponse, error) {
-	s.lock.Lock()
-	defer s.lock.Unlock()
 	var empty github.PRResponse
 
 	branch, err0 := s.repo.CreateBranch(promo.GetMeta().ID)

@@ -48,9 +48,11 @@ func (s *AuthSessions) setRateLimited(id string) {
 func (s *AuthSessions) isRateLimited(id string) (bool) {
 	s.lock.Lock()
 	defer s.lock.Unlock()
+
 	if timestamp, ok := s.cooldowns[id]; ok {
 		return time.Since(timestamp).Minutes() < s.timeout.Minutes()
 	}
+
 	return false
 }
 
