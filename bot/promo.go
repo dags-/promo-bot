@@ -72,7 +72,6 @@ func (b *Bot) postPromotion(pr promo.Promo) {
 	}
 
 	message := &discordgo.MessageSend{
-		Content: meta.Discord,
 		Embed:   embed,
 	}
 

@@ -19,8 +19,8 @@ type Api struct {
 	Twitchers map[string]promo.Promo `json:"twitchers"`
 }
 
-func newApi(repo github.Repo) Api {
-	return Api{
+func newApi(repo github.Repo) *Api {
+	return &Api{
 		repo: repo,
 	}
 }

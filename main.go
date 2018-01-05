@@ -44,7 +44,7 @@ func main() {
 	session := github.NewSession(*ghtoken)
 	rep := session.NewRepo(*owner, *repo)
 	s := server.NewServer(session, rep, *clientId, *clientSecret, *redirectUri)
-	b := bot.NewBot(&s.Api)
+	b := bot.NewBot(s.Api)
 
 	go s.Start(*port)
 	go b.Start(*clientToken)

@@ -23,7 +23,7 @@ type Server struct {
 	session      github.Session
 	repo         github.Repo
 	auth         AuthSessions
-	Api          Api
+	Api          *Api
 	clientId     string
 	clientSecret string
 	redirectUri  string
