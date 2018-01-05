@@ -84,3 +84,10 @@ func (t Twitcher) GetMeta() (*Meta) {
 func (y Youtuber) GetMeta() (*Meta) {
 	return &y.Meta
 }
+
+func Or(exp bool, a, b string) string {
+	if exp {
+		return a
+	}
+	return b
+}

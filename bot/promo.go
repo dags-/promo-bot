@@ -51,7 +51,7 @@ func (b *Bot) postPromotion(pr promo.Promo) {
 		embed.Author.Name = "#Server"
 		embed.Fields = []*discordgo.MessageEmbedField{
 			{Name: "IP", Value: s.IP, Inline: true},
-			{Name: "Whitelist", Value: fmt.Sprint(s.Whitelist), Inline: true},
+			{Name: "Whitelist", Value: promo.Or(s.Whitelist, "Yes", "No"), Inline: true},
 		}
 		break
 	case "twitcher":
