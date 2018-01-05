@@ -3,7 +3,6 @@ package bot
 import (
 	"fmt"
 	"github.com/bwmarrin/discordgo"
-	"github.com/dags-/GoLauncher/logging"
 	"regexp"
 	"strconv"
 	"strings"
@@ -66,7 +65,7 @@ func (b *Bot) command(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 		num, err := strconv.Atoi(match[1])
 		if err != nil {
-			logging.Log(err)
+			fmt.Println(err)
 		}
 
 		s.ChannelMessageDelete(m.ChannelID, m.ID)
