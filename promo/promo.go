@@ -17,8 +17,14 @@ type Meta struct {
 	Type        string `json:"type"`
 	Description string `json:"description"`
 	Icon        string `json:"icon"`
-	Link        string `json:"link"`
-	Media       string `json:"media"`
+	Website     string `json:"website"`
+	Discord     string `json:"discord"`
+	Media       Media  `json:"media"`
+}
+
+type Media struct {
+	Type string `json:"type"`
+	URL  string `json:"url"`
 }
 
 type Server struct {

@@ -7,15 +7,15 @@ import (
 
 type AuthSessions struct {
 	lock      sync.RWMutex
-	timeout    time.Duration
+	timeout   time.Duration
 	sessions  map[string]time.Time
 	cooldowns map[string]time.Time
 }
 
 func newAuthSessions() AuthSessions {
 	return AuthSessions{
-		timeout: time.Duration(time.Minute * 30),
-		sessions: make(map[string]time.Time),
+		timeout:   time.Duration(time.Minute * 30),
+		sessions:  make(map[string]time.Time),
 		cooldowns: make(map[string]time.Time),
 	}
 }

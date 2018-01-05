@@ -25,20 +25,28 @@
         <input id="name" name="name" type="text" maxlength="120">
     </section>
     <section>
-        <label>Link an image url to add an icon to your promo post</label>
-        <input id="icon" name="icon" maxlength="240">
-    </section>
-    <section>
-        <label>Describe what you're all about (you can use Discord message styling here!)</label>
+        <label>Describe what you're all about</label>
         <textarea id="description" name="description" maxlength="240"></textarea>
     </section>
     <section>
-        <label>Got a website or discord you'd like people to visit?</label>
+        <label>Provide an icon/logo url to accompany your post (square/circle works best)</label>
+        <input id="icon" name="icon" maxlength="240">
+    </section>
+    <section>
+        <label>Want to include your website address with the post?</label>
         <input id="link" name="link" maxlength="120">
     </section>
     <section>
-        <label>Link a video/image to accompany your promo post</label>
-        <input id="media" name="media" maxlength="120">
+        <label>Want to add a discord join link to your post?</label>
+        <input id="discord" name="discord" maxlength="120">
+    </section>
+    <section>
+        <label>Link some media to accompany your post</label>
+        <select id="media-type" name="media-type">
+            <option>image</option>
+            <!-- <option>video</option>-->
+        </select>
+        <input id="media-url" name="media-url" maxlength="120">
     </section>
     <section id="details"></section>
     <input type="submit">

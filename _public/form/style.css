@@ -43,3 +43,13 @@ textarea {
     max-width: 100%;
     min-height: 80px;
 }
+
+#media-type {
+    width: 80px;
+    display: inline-block;
+}
+
+#media-url {
+    width: calc(100% - 85px);
+    display: inline-block;
+}
