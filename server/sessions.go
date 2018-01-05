@@ -1,8 +1,8 @@
 package server
 
 import (
-	"time"
 	"sync"
+	"time"
 )
 
 type AuthSessions struct {

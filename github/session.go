@@ -1,9 +1,9 @@
 package github
 
 import (
-	"golang.org/x/oauth2"
 	"context"
 	"github.com/google/go-github/github"
+	"golang.org/x/oauth2"
 )
 
 type Session struct {

@@ -1,21 +1,25 @@
 package server
 
 import (
-	"github.com/qiangxue/fasthttp-routing"
-	"github.com/dags-/promo-bot/github"
-	"github.com/valyala/fasthttp"
-	"time"
-	"fmt"
-	"io"
 	"encoding/json"
+	"fmt"
+	"github.com/dags-/promo-bot/github"
+	"github.com/qiangxue/fasthttp-routing"
+	"github.com/valyala/fasthttp"
+	"io"
+	"strings"
+	"time"
 )
 
 const apiRoute = "/api/<type>"
 const apiIdRoute = "/api/<type>/<id>"
-const previewRoute = "/preview/<type>/<id>"
+const serverCardRoute = "/sv/<id>"
+const twitchCardRoute = "/tw/<id>"
+const youtubeCardRoute = "/yt/<id>"
 const authRoute = "/auth"
-const promotionRoute = "/promotion"
-const promotionAuthRoute = "/promotion/<auth>"
+const filesRoute = "/files/*"
+const promotionRoute = "/apply"
+const promotionAuthRoute = "/apply/<auth>"
 
 type Server struct {
 	session      github.Session
@@ -26,6 +30,8 @@ type Server struct {
 	clientSecret string
 	redirectUri  string
 }
+
+type PathMap map[string]string
 
 func NewServer(s github.Session, r github.Repo, clientId, clientSecret, redirectUri string) Server {
 	return Server{
@@ -43,11 +49,16 @@ func (s *Server) Start(port int) {
 	router := routing.New()
 	router.Get(apiRoute, s.handleApi)
 	router.Get(apiIdRoute, s.handleApi)
-	router.Get(previewRoute, s.handlePreview)
+	router.Get(serverCardRoute, s.handleSV)
+	router.Get(twitchCardRoute, s.handleTW)
+	router.Get(youtubeCardRoute, s.handleYT)
 	router.Get(authRoute, s.handleAuth)
 	router.Get(promotionRoute, s.redirect)
 	router.Get(promotionAuthRoute, s.handleAppGet)
 	router.Post(promotionAuthRoute, s.handleAppPost)
+	router.Get(filesRoute, newFileHandler())
+
+	router.Use()
 
 	server := fasthttp.Server{
 		Handler: router.HandleRequest,
@@ -65,6 +76,24 @@ func (s *Server) Start(port int) {
 	go startServerLoop(s)
 
 	panic(server.ListenAndServe(fmt.Sprintf(":%v", port)))
+}
+
+func newFileHandler() (func(context *routing.Context)error) {
+	prefix := strings.TrimSuffix(filesRoute, "/*")
+	split := len([]byte(prefix))
+
+	fs := fasthttp.FS{
+		Root: "_public/",
+		PathRewrite: func(ctx *fasthttp.RequestCtx) []byte {
+			return ctx.Path()[split:]
+		},
+	}
+
+	handler := fs.NewRequestHandler()
+	return func(c *routing.Context) error {
+		handler(c.RequestCtx)
+		return nil
+	}
 }
 
 func startServerLoop(s *Server) {

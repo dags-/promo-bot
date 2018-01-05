@@ -1,11 +1,11 @@
 package main
 
 import (
-	"github.com/dags-/promo-bot/server"
-	"github.com/dags-/promo-bot/github"
+	"bufio"
 	"flag"
 	"fmt"
-	"bufio"
+	"github.com/dags-/promo-bot/github"
+	"github.com/dags-/promo-bot/server"
 	"os"
 )
 

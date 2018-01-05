@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="#Server">
+    <meta name="viewport" content="width=device-width">
+    <meta property="og:title" content="{{.Name}}}">
+    <meta property="og:description" content="{{.Website}}">
+    <meta property="og:image" content="{{.Icon}}}">
+</head>
+{{if .Website}}
+<script>
+    window.location.href = "{{.Website}}"
+</script>
+{{end}}
+</html>

@@ -1,19 +1,19 @@
 package server
 
 import (
-	"github.com/dags-/promo-bot/promo"
-	"github.com/qiangxue/fasthttp-routing"
-	"fmt"
 	"bytes"
 	"errors"
+	"fmt"
 	"github.com/dags-/promo-bot/github"
+	"github.com/dags-/promo-bot/promo"
+	"github.com/qiangxue/fasthttp-routing"
 	"strings"
 )
 
 func (s *Server) handleAppGet(c *routing.Context) error  {
 	id := c.Param("auth")
 	if s.auth.isRateLimited(id) {
-		return errors.New("Please come back later")
+		return errors.New("please come back later")
 	}
 
 	if !s.auth.isAuthenticated(id) {
@@ -23,7 +23,7 @@ func (s *Server) handleAppGet(c *routing.Context) error  {
 	c.Response.Header.Set("Cache-Control", "no-cache, no-store, must-revalidate")
 	c.Response.Header.Set("Pragma", "no-cache")
 	c.Response.Header.Set("Expires", "0")
-	c.SendFile("docs/index.html")
+	c.SendFile("_public/form/index.html")
 
 	return nil
 }
@@ -63,14 +63,14 @@ func (s *Server) handleAppPost(c *routing.Context) error  {
 		server.Whitelist = wl
 		p = &server
 		break
-	case "youtuber":
+	case "youtube":
 		var youtuber promo.Youtuber
 		youtuber.Meta = meta
 		youtuber.ChannelName = getString(c, "channel")
 		youtuber.URL = getString(c, "url")
 		p = &youtuber
 		break
-	case "twitcher":
+	case "twitch":
 		var twitcher promo.Twitcher
 		twitcher.Meta = meta
 		twitcher.UserName = getString(c, "username")

@@ -1,8 +1,8 @@
 package github
 
 import (
-	"fmt"
 	"encoding/base64"
+	"fmt"
 )
 
 type Contents struct {

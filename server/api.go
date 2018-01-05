@@ -1,13 +1,13 @@
 package server
 
 import (
-	"github.com/dags-/promo-bot/promo"
-	"sync"
-	"fmt"
-	"net/http"
-	"github.com/qiangxue/fasthttp-routing"
 	"errors"
+	"fmt"
 	"github.com/dags-/promo-bot/github"
+	"github.com/dags-/promo-bot/promo"
+	"github.com/qiangxue/fasthttp-routing"
+	"net/http"
+	"sync"
 )
 
 type Api struct {
@@ -62,7 +62,7 @@ func (api *Api) GetPromo(promoType, promoId string) (promo.Promo, error) {
 		return pr, nil
 	}
 
-	return nil, errors.New("Promotion for id not found")
+	return nil, errors.New("promotion for id not found")
 }
 
 func (api *Api) GetType(promoType string) (map[string]promo.Promo, error) {
@@ -110,10 +110,10 @@ func (api *Api) tick() {
 		case "server":
 			servers[pr.GetMeta().ID] = pr
 			break
-		case "youtuber":
+		case "youtube":
 			youtubers[pr.GetMeta().ID] = pr
 			break
-		case "twitcher":
+		case "twitch":
 			twitchers[pr.GetMeta().ID] = pr
 			break
 		}

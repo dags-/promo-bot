@@ -1,18 +1,25 @@
 package server
 
 import (
-	"github.com/qiangxue/fasthttp-routing"
-	"net/http"
+	"bytes"
 	"encoding/json"
-	"fmt"
-	"net/url"
-	"strings"
 	"errors"
+	"fmt"
+	"github.com/qiangxue/fasthttp-routing"
+	"html/template"
+	"net/http"
+	"net/url"
+	"strconv"
+	"strings"
 )
 
 const authUrl = "https://discordapp.com/oauth2/authorize"
 const userUrl = "https://discordapp.com/api/users/@me"
 const tokenUrl = "https://discordapp.com/api/oauth2/token"
+
+var (
+	home = template.Must(template.ParseFiles("_template/home/home.html"))
+)
 
 func (s *Server) redirect(c *routing.Context) error {
 	form := url.Values{}
@@ -21,7 +28,13 @@ func (s *Server) redirect(c *routing.Context) error {
 	form.Set("response_type", "code")
 	form.Set("redirect_uri", s.redirectUri)
 	u := fmt.Sprint(authUrl, "?", form.Encode())
-	c.Redirect(u, 302)
+	buf := bytes.Buffer{}
+	err := home.Execute(&buf, u)
+	if err != nil {
+		return err
+	}
+	c.Response.Header.Set("Content-Type", "text/html")
+	c.Response.SetBody(buf.Bytes())
 	return nil
 }
 
@@ -57,7 +70,7 @@ func (s *Server) handleAuth(c *routing.Context) error {
 	token := tokenAuth["access_token"]
 	req, _ = http.NewRequest("GET", userUrl, nil)
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
-	req.Header.Set("User-Agent", "handleLogin (n/a, 1.0)")
+	req.Header.Set("User-Agent", "PromoBot (n/a, 1.0)")
 	resp, err3 := client.Do(req)
 	if err3 != nil {
 		return err3
@@ -70,12 +83,18 @@ func (s *Server) handleAuth(c *routing.Context) error {
 		return err4
 	}
 
-	raw, ok := user["id"];
+	raw, ok := user["id"]
 	if !ok {
-		return errors.New("Could not authenticate")
+		return errors.New("could not authenticate")
 	}
 
-	auth := fmt.Sprint(raw)
+	id := raw.(string)
+	i, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		return err
+	}
+
+	auth := strconv.FormatInt(i, 36)
 	redirect := fmt.Sprint(promotionRoute, "/", auth)
 	s.auth.setAuthenticated(auth)
 	c.Redirect(redirect, 302)

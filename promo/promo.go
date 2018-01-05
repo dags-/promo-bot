@@ -2,9 +2,9 @@ package promo
 
 import (
 	"encoding/json"
+	"errors"
 	"io"
 	"io/ioutil"
-	"errors"
 )
 
 type Promo interface {
@@ -16,6 +16,7 @@ type Meta struct {
 	Name        string `json:"name"`
 	Type        string `json:"type"`
 	Description string `json:"description"`
+	Icon        string `json:"icon"`
 	Media       string `json:"media"`
 	Discord     string `json:"discord"`
 }
@@ -23,7 +24,7 @@ type Meta struct {
 type Server struct {
 	Meta
 	IP        string `json:"ip"`
-	Whitelist bool `json:"whitelist"`
+	Whitelist bool   `json:"whitelist"`
 	Website   string `json:"website"`
 }
 
