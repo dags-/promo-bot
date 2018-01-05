@@ -1,7 +1,7 @@
 window.addEventListener('load', function() {
     document.getElementById('type').addEventListener('change', onTypeChange);
     selectType('server');
-})
+});
 
 function onTypeChange() {
     var index = this.selectedIndex;
@@ -23,27 +23,22 @@ function selectType(type) {
 }
 
 function showServerInput(div) {
-    var ip = makeInput("What's the server's ip address?", 'ip', 'text');
-    var website = makeInput("What's your website (if you have one)?", 'website', 'text');
-    var whitelist = makeInput("Does your server use a whitelist?", 'whitelist', 'checkbox');
-
-    div.appendChild(ip);
-    div.appendChild(website);
-    div.appendChild(whitelist);
+    div.appendChild(makeInput("What's the server's ip address?", 'ip', 'text'));
+    div.appendChild(makeInput("Does your server use a whitelist?", 'whitelist', 'checkbox'));
 }
 
 function showYoutuberInput(div) {
-    var title = makeInput("What's the name/title of your youtube channel?", 'title', 'text');
-    var address = makeInput("What's the url of your youtube channel?", 'url', 'text');
-    div.appendChild(title);
-    div.appendChild(address);
+    // var title = makeInput("What's the name/title of your youtube channel?", 'title', 'text');
+    // var address = makeInput("What's the url of your youtube channel?", 'url', 'text');
+    // div.appendChild(title);
+    // div.appendChild(address);
 }
 
 function showTwitcherInput(div) {
-    var username = makeInput("What's your twitch username?", 'username', 'text');
-    var address = makeInput("What's the url for your twitch channel?", 'url', 'text');
-    div.appendChild(username);
-    div.appendChild(address);
+    // var username = makeInput("What's your twitch username?", 'username', 'text');
+    // var address = makeInput("What's the url for your twitch channel?", 'url', 'text');
+    // div.appendChild(username);
+    // div.appendChild(address);
 }
 
 function makeInput(title, name, type) {

@@ -7,10 +7,9 @@ import (
 	"github.com/dags-/promo-bot/github"
 	"github.com/dags-/promo-bot/promo"
 	"github.com/qiangxue/fasthttp-routing"
-	"strings"
 )
 
-func (s *Server) handleAppGet(c *routing.Context) error  {
+func (s *Server) handleAppGet(c *routing.Context) error {
 	id := c.Param("auth")
 	if s.auth.isRateLimited(id) {
 		return errors.New("please come back later")
@@ -28,7 +27,7 @@ func (s *Server) handleAppGet(c *routing.Context) error  {
 	return nil
 }
 
-func (s *Server) handleAppPost(c *routing.Context) error  {
+func (s *Server) handleAppPost(c *routing.Context) error {
 	id := c.Param("auth")
 	if !s.auth.isAuthenticated(id) {
 		return s.redirect(c)
@@ -37,12 +36,13 @@ func (s *Server) handleAppPost(c *routing.Context) error  {
 	var p promo.Promo
 
 	meta := promo.Meta{
-		ID: id,
-		Type: getString(c, "type"),
-		Name: getString(c, "name"),
+		ID:          id,
+		Type:        getString(c, "type"),
+		Name:        getString(c, "name"),
+		Link:        getString(c, "link"),
+		Icon:        getString(c, "icon"),
+		Media:       getString(c, "media"),
 		Description: getString(c, "description"),
-		Media: getString(c, "media"),
-		Discord: getString(c, "discord"),
 	}
 
 	err := validate(meta)
@@ -51,7 +51,7 @@ func (s *Server) handleAppPost(c *routing.Context) error  {
 	}
 
 	s.auth.dropAuthentication(id) // disallow further posts for this session
-	s.auth.setRateLimited(id) // mark user as rate limited (can't post again for 30 mins)
+	s.auth.setRateLimited(id)     // mark user as rate limited (can't post again for 30 mins)
 
 	switch meta.Type {
 	case "server":
@@ -59,22 +59,18 @@ func (s *Server) handleAppPost(c *routing.Context) error  {
 		var server promo.Server
 		server.Meta = meta
 		server.IP = getString(c, "ip")
-		server.Website = getString(c, "website")
+		server.Link = getString(c, "link")
 		server.Whitelist = wl
 		p = &server
 		break
 	case "youtube":
 		var youtuber promo.Youtuber
 		youtuber.Meta = meta
-		youtuber.ChannelName = getString(c, "channel")
-		youtuber.URL = getString(c, "url")
 		p = &youtuber
 		break
 	case "twitch":
 		var twitcher promo.Twitcher
 		twitcher.Meta = meta
-		twitcher.UserName = getString(c, "username")
-		twitcher.URL = getString(c, "url")
 		p = &twitcher
 		break
 	}
@@ -110,10 +106,6 @@ func validate(meta promo.Meta) (error) {
 		return errors.New("Description is too long")
 	}
 
-	if len(meta.Discord) > 0 && !strings.HasSuffix(meta.Discord, "https://discord.gg/") {
-		return errors.New("Invalid discord join link")
-	}
-
 	return nil
 }
 
@@ -122,7 +114,7 @@ func (s *Server) submit(promo promo.Promo) (github.PRResponse, error) {
 
 	branch, err0 := s.repo.CreateBranch(promo.GetMeta().ID)
 	if err0 != nil {
-		 return empty, err0
+		return empty, err0
 	}
 
 	buf := bytes.Buffer{}
@@ -136,7 +128,7 @@ func (s *Server) submit(promo promo.Promo) (github.PRResponse, error) {
 
 	err3 := branch.CreateFile(filename, content)
 	if err3 != nil {
-		 return empty, err3
+		return empty, err3
 	}
 
 	title := fmt.Sprint("Promo for ", promo.GetMeta().Name)

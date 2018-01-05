@@ -10,3 +10,5 @@
 *.xml
 .idea/
 test.go
+*.json
+*.txt

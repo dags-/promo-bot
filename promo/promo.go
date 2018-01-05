@@ -17,27 +17,22 @@ type Meta struct {
 	Type        string `json:"type"`
 	Description string `json:"description"`
 	Icon        string `json:"icon"`
+	Link        string `json:"link"`
 	Media       string `json:"media"`
-	Discord     string `json:"discord"`
 }
 
 type Server struct {
 	Meta
 	IP        string `json:"ip"`
 	Whitelist bool   `json:"whitelist"`
-	Website   string `json:"website"`
 }
 
 type Youtuber struct {
 	Meta
-	ChannelName string `json:"title"`
-	URL         string `json:"url"`
 }
 
 type Twitcher struct {
 	Meta
-	UserName string `json:"username"`
-	URL      string `json:"url"`
 }
 
 func Read(r io.Reader) (Promo, error) {
@@ -70,4 +65,16 @@ func Read(r io.Reader) (Promo, error) {
 
 func (m *Meta) GetMeta() (*Meta) {
 	return m
+}
+
+func (s Server) GetMeta() (*Meta) {
+	return &s.Meta
+}
+
+func (t Twitcher) GetMeta() (*Meta) {
+	return &t.Meta
+}
+
+func (y Youtuber) GetMeta() (*Meta) {
+	return &y.Meta
 }

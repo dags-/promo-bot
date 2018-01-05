@@ -11,8 +11,8 @@ import (
 	"time"
 )
 
-const apiRoute = "/api/<type>"
-const apiIdRoute = "/api/<type>/<id>"
+const apiRoute = "/Api/<type>"
+const apiIdRoute = "/Api/<type>/<id>"
 const serverCardRoute = "/sv/<id>"
 const twitchCardRoute = "/tw/<id>"
 const youtubeCardRoute = "/yt/<id>"
@@ -25,7 +25,7 @@ type Server struct {
 	session      github.Session
 	repo         github.Repo
 	auth         AuthSessions
-	api          Api
+	Api          Api
 	clientId     string
 	clientSecret string
 	redirectUri  string
@@ -35,13 +35,13 @@ type PathMap map[string]string
 
 func NewServer(s github.Session, r github.Repo, clientId, clientSecret, redirectUri string) Server {
 	return Server{
-		session: s,
-		repo: r,
-		clientId: clientId,
+		session:      s,
+		repo:         r,
+		clientId:     clientId,
 		clientSecret: clientSecret,
-		redirectUri: redirectUri,
-		api: newApi(r),
-		auth: newAuthSessions(),
+		redirectUri:  redirectUri,
+		Api:          newApi(r),
+		auth:         newAuthSessions(),
 	}
 }
 
@@ -99,7 +99,7 @@ func newFileHandler() (func(context *routing.Context)error) {
 func startServerLoop(s *Server) {
 	sleep := time.Duration(time.Minute * 15)
 	for {
-		s.api.tick()
+		s.Api.tick()
 		s.auth.tick()
 		time.Sleep(sleep)
 	}

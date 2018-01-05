@@ -27,7 +27,7 @@ func (s *Server) handleYT(c *routing.Context) error {
 
 func handleCard(group string, s *Server, c *routing.Context) error {
 	promoId := c.Param("id")
-	promo, err := s.api.GetPromo(group, promoId)
+	promo, err := s.Api.GetPromo(group, promoId)
 	if err != nil {
 		return err
 	}

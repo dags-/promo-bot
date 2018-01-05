@@ -6,6 +6,7 @@ import (
 	"github.com/dags-/promo-bot/github"
 	"github.com/dags-/promo-bot/promo"
 	"github.com/qiangxue/fasthttp-routing"
+	"math/rand"
 	"net/http"
 	"sync"
 )
@@ -25,7 +26,7 @@ func newApi(repo github.Repo) Api {
 }
 
 func (s *Server) handleApi(c *routing.Context) error {
-	api := s.api
+	api := s.Api
 	promoType := c.Param("type")
 	promoId := c.Param("id")
 
@@ -50,6 +51,34 @@ func (s *Server) handleApi(c *routing.Context) error {
 	}
 
 	return toJson(promos, c.Response.BodyWriter())
+}
+
+func (api *Api) GetPromoQueue() ([]promo.Promo) {
+	api.lock.Lock()
+	defer api.lock.Unlock()
+
+	promos := []promo.Promo{}
+	for _, p := range api.Servers {
+		promos = append(promos, p)
+	}
+	for _, p := range api.Twitchers {
+		promos = append(promos, p)
+	}
+	for _, p := range api.Youtubers {
+		promos = append(promos, p)
+	}
+
+	if len(promos) > 1 {
+		return promos
+	}
+
+	queue := make([]promo.Promo, len(promos))
+	perm := rand.Perm(len(promos))
+	for i, v := range perm {
+		queue[v] = promos[i]
+	}
+
+	return queue
 }
 
 func (api *Api) GetPromo(promoType, promoId string) (promo.Promo, error) {
