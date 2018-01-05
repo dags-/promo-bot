@@ -9,21 +9,31 @@ import (
 
 func (b *Bot) StartLoop() {
 	go func() {
-		pause := time.Duration(15) * time.Second
+		h := NewHistory(5)
+
 		for {
 			promos := b.api.GetPromoQueue()
+			start := time.Now()
+			interval := b.config.getInterval()
 
+			fmt.Printf("Starting new promotions run: %v\n", len(promos))
 			for _, pr := range promos {
 				uid := fmt.Sprint(pr.GetMeta().Type, "-", pr.GetMeta().ID)
 
-				if uid != b.lastPromo {
-					b.postPromotion(pr)
-					b.lastPromo = uid
-					time.Sleep(b.config.getInterval())
+				if h.Contains(uid) {
+					continue
 				}
+
+				b.postPromotion(pr)
+				h.Add(uid)
+				time.Sleep(interval)
 			}
 
-			time.Sleep(pause)
+			remaining := interval - time.Since(start)
+			if remaining > 0 {
+				fmt.Println("Sleeping remaining time: ", remaining)
+				time.Sleep(remaining)
+			}
 		}
 	}()
 }

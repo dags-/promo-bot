@@ -11,7 +11,7 @@ var (
 )
 
 type Bot struct {
-	config    Config
+	config    *Config
 	lastPromo string
 	sess      *discordgo.Session
 	api       *server.Api

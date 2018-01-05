@@ -3,8 +3,13 @@ package bot
 import (
 	"fmt"
 	"github.com/bwmarrin/discordgo"
+	"github.com/dags-/GoLauncher/logging"
+	"regexp"
+	"strconv"
 	"strings"
 )
+
+var numMatch = regexp.MustCompile("!interval ([0-9]+) .*?")
 
 func (b *Bot) ready(s *discordgo.Session, r *discordgo.Ready) {
 	fmt.Println("Bot ready")
@@ -13,7 +18,7 @@ func (b *Bot) ready(s *discordgo.Session, r *discordgo.Ready) {
 }
 
 func (b *Bot) join(s *discordgo.Session, j *discordgo.GuildCreate) {
-	fmt.Println("Joined guild ", j.Name)
+	fmt.Println("Joined guild", j.Name)
 }
 
 func (b *Bot) command(s *discordgo.Session, m *discordgo.MessageCreate) {
@@ -34,7 +39,6 @@ func (b *Bot) command(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	if !mentions {
-		fmt.Println("No mentions!")
 		return
 	}
 
@@ -42,14 +46,31 @@ func (b *Bot) command(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if strings.Contains(input, "!add") && !b.config.hasChannel(m.ChannelID) {
 		s.ChannelMessageDelete(m.ChannelID, m.ID)
 		b.config.addChannel(m.ChannelID)
-		fmt.Println("Adding channel: ", m.ChannelID)
+		fmt.Printf("Adding channel: %s\n", m.ChannelID)
 		return
 	}
 
 	if strings.Contains(input, "!remove") && b.config.hasChannel(m.ChannelID) {
 		s.ChannelMessageDelete(m.ChannelID, m.ID)
 		b.config.removeChannel(m.ChannelID)
-		fmt.Println("Removing channel: ", m.ChannelID)
+		fmt.Printf("Removing channel: %s\n", m.ChannelID)
 		return
+	}
+
+	if strings.Contains(input, "!interval ") && b.config.hasChannel(m.ChannelID) {
+		match := numMatch.FindStringSubmatch(input)
+		if len(match) != 2 {
+			fmt.Printf("Invalid time: '%s'\n", input)
+			return
+		}
+
+		num, err := strconv.Atoi(match[1])
+		if err != nil {
+			logging.Log(err)
+		}
+
+		s.ChannelMessageDelete(m.ChannelID, m.ID)
+		b.config.setInterval(num)
+		fmt.Printf("Setting interval: %v\n", num)
 	}
 }
