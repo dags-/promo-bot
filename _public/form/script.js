@@ -57,36 +57,6 @@ function makeInput(title, name, type) {
     return section;
 }
 
-function makeYesNoChecks() {
-    var yes = document.createElement('input');
-    yes.type = 'checkbox';
-    yes.name = 'whitelist.yes';
-    yes.id = 'whitelist-yes';
-    yes.checked = false;
-
-    var no = document.createElement('input');
-    no.type = 'checkbox';
-    no.name = 'whitelist.no';
-    no.id = 'whitelist-no';
-    no.checked = true;
-
-    yes.addEventListener('change', function() {
-        console.log(this.value);
-        no.checked = !this.checked;
-    });
-
-    no.addEventListener('change', function() {
-        console.log(this.value);
-        yes.checked = !this.checked;
-    });
-
-    var section = document.createElement('section');
-    section.appendChild(yes);
-    section.appendChild(no);
-
-    return section;
-}
-
 function clear(div) {
     while (div.lastChild !== null) {
         div.removeChild(div.lastChild);

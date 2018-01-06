@@ -68,7 +68,6 @@ func (s *Server) handleAppPost(c *routing.Context) error {
 		var server promo.Server
 		server.Meta = meta
 		server.IP = getString(c, "ip")
-		server.Website = getString(c, "link")
 		server.Whitelist = wl
 		p = &server
 		break
@@ -107,7 +106,7 @@ func validate(meta promo.Meta) (error) {
 		return errors.New("name is too long")
 	}
 
-	if len(meta.Description) > 240 {
+	if len(meta.Description) > 480 {
 		return errors.New("description is too long")
 	}
 

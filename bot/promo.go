@@ -14,24 +14,20 @@ func (b *Bot) StartLoop() {
 		for {
 			promos := b.api.GetPromoQueue()
 			start := time.Now()
-			interval := b.config.getInterval()
 
 			fmt.Printf("Starting new promotions run: %v\n", len(promos))
 			for _, pr := range promos {
-				uid := fmt.Sprint(pr.GetMeta().Type, "-", pr.GetMeta().ID)
-
-				if h.Contains(uid) {
+				if h.Contains(pr.GetMeta().ID) {
 					continue
 				}
 
 				b.postPromotion(pr)
-				h.Add(uid)
-				time.Sleep(interval)
+				h.Add(pr.GetMeta().ID)
+				time.Sleep(b.config.getInterval())
 			}
 
-			remaining := interval - time.Since(start)
+			remaining := b.config.getInterval() - time.Since(start)
 			if remaining > 0 {
-				fmt.Println("Sleeping remaining time: ", remaining)
 				time.Sleep(remaining)
 			}
 		}
@@ -46,11 +42,14 @@ func (b *Bot) postPromotion(pr promo.Promo) {
 		URL:         meta.Website,
 		Description: meta.Description,
 		Author: &discordgo.MessageEmbedAuthor{
-			URL: meta.Discord,
+			URL: promo.Or(meta.Discord == "", meta.Website, meta.Discord),
 			IconURL: meta.Icon,
 		},
 		Thumbnail: &discordgo.MessageEmbedThumbnail{
 			URL: meta.Icon,
+		},
+		Provider: &discordgo.MessageEmbedProvider{
+			Name: "promo-bot",
 		},
 	}
 
@@ -74,6 +73,10 @@ func (b *Bot) postPromotion(pr promo.Promo) {
 		break
 	}
 
+	message := &discordgo.MessageSend{
+		Embed: embed,
+	}
+
 	if meta.Media.Type == "image" {
 		embed.Image = &discordgo.MessageEmbedImage{
 			URL: meta.Media.URL,
@@ -82,10 +85,6 @@ func (b *Bot) postPromotion(pr promo.Promo) {
 		embed.Video = &discordgo.MessageEmbedVideo{
 			URL: meta.Media.URL,
 		}
-	}
-
-	message := &discordgo.MessageSend{
-		Embed:   embed,
 	}
 
 	channels := b.config.getChannels()
@@ -97,6 +96,10 @@ func (b *Bot) postPromotion(pr promo.Promo) {
 		}
 
 		_, err := b.sess.ChannelMessageSendComplex(ch, message)
+		if err == nil && meta.Media.Type == "video" {
+			b.sess.ChannelMessageSend(ch, meta.Media.URL)
+		}
+
 		if err != nil {
 			fmt.Println("Post err: ", err)
 		}
