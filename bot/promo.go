@@ -74,9 +74,12 @@ func (b *Bot) postPromotion(pr promo.Promo) {
 		break
 	}
 
-	// video embed not working :/
 	if meta.Media.Type == "image" {
 		embed.Image = &discordgo.MessageEmbedImage{
+			URL: meta.Media.URL,
+		}
+	} else if meta.Media.Type == "video" { // video embed not working :/
+		embed.Video = &discordgo.MessageEmbedVideo{
 			URL: meta.Media.URL,
 		}
 	}
