@@ -64,13 +64,13 @@ func (b *Bot) postPromotion(pr promo.Promo) {
 			{Name: "Whitelist", Value: promo.Or(s.Whitelist, "Yes", "No"), Inline: true},
 		}
 		break
-	case "twitcher":
+	case "twitch":
 		embed.Color = 0x0080ff
-		embed.Author.Name = "#Twitcher"
+		embed.Author.Name = "#Twitch"
 		break
-	case "youtuber":
+	case "youtube":
 		embed.Color = 0xff8080
-		embed.Author.Name = "#Youtuber"
+		embed.Author.Name = "#Youtube"
 		break
 	}
 

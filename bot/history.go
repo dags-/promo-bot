@@ -85,9 +85,10 @@ func (h *History) Write() {
 	for node != nil {
 		array[i] = node.id
 		node = node.next
+		i++
 	}
 
-	data, err := json.MarshalIndent(array[:i+1], "", "  ")
+	data, err := json.MarshalIndent(array[:i], "", "  ")
 	if err != nil {
 		fmt.Println(err)
 		return

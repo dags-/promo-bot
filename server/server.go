@@ -93,7 +93,7 @@ func newFileHandler() (func(context *routing.Context) error) {
 }
 
 func startServerLoop(s *Server) {
-	sleep := time.Duration(time.Minute * 15)
+	sleep := time.Duration(time.Minute * 5)
 	for {
 		s.Api.tick()
 		s.auth.tick()

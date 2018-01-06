@@ -33,11 +33,11 @@ type Server struct {
 	Whitelist bool   `json:"whitelist"`
 }
 
-type Youtuber struct {
+type Youtube struct {
 	Meta
 }
 
-type Twitcher struct {
+type Twitch struct {
 	Meta
 }
 
@@ -58,12 +58,12 @@ func Read(r io.Reader) (Promo, error) {
 	case "server":
 		var s Server
 		return &s, json.Unmarshal(data, &s)
-	case "youtuber":
-		var y Youtuber
-		return &y, json.Unmarshal(data, &y)
-	case "twitcher":
-		var t Twitcher
+	case "twitch":
+		var t Twitch
 		return &t, json.Unmarshal(data, &t)
+	case "youtube":
+		var y Youtube
+		return &y, json.Unmarshal(data, &y)
 	default:
 		return &meta, errors.New("Invalid promo type: " + meta.Type)
 	}
@@ -77,11 +77,11 @@ func (s Server) GetMeta() (*Meta) {
 	return &s.Meta
 }
 
-func (t Twitcher) GetMeta() (*Meta) {
+func (t Twitch) GetMeta() (*Meta) {
 	return &t.Meta
 }
 
-func (y Youtuber) GetMeta() (*Meta) {
+func (y Youtube) GetMeta() (*Meta) {
 	return &y.Meta
 }
 

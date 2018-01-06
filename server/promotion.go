@@ -72,15 +72,15 @@ func (s *Server) handleAppPost(c *routing.Context) error {
 		server.Whitelist = wl
 		p = &server
 		break
-	case "youtuber":
-		var youtuber promo.Youtuber
-		youtuber.Meta = meta
-		p = &youtuber
+	case "twitch":
+		var twitch promo.Twitch
+		twitch.Meta = meta
+		p = &twitch
 		break
-	case "twitcher":
-		var twitcher promo.Twitcher
-		twitcher.Meta = meta
-		p = &twitcher
+	case "youtube":
+		var youtube promo.Youtube
+		youtube.Meta = meta
+		p = &youtube
 		break
 	}
 

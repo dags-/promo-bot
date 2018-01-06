@@ -15,10 +15,10 @@ function selectType(type) {
     switch (type) {
         case "server":
             return showServerInput(details);
-        case "youtuber":
-            return showYoutuberInput(details);
-        case "twitcher":
-            return showTwitcherInput(details);
+        case "twitch":
+            return showTwitchInput(details);
+        case "youtube":
+            return showYoutubeInput(details);
     }
 }
 
@@ -27,14 +27,14 @@ function showServerInput(div) {
     div.appendChild(makeInput("Does your server use a whitelist?", 'whitelist', 'checkbox'));
 }
 
-function showYoutuberInput(div) {
+function showYoutubeInput(div) {
     // var title = makeInput("What's the name/title of your youtube channel?", 'title', 'text');
     // var address = makeInput("What's the url of your youtube channel?", 'url', 'text');
     // div.appendChild(title);
     // div.appendChild(address);
 }
 
-function showTwitcherInput(div) {
+function showTwitchInput(div) {
     // var username = makeInput("What's your twitch username?", 'username', 'text');
     // var address = makeInput("What's the url for your twitch channel?", 'url', 'text');
     // div.appendChild(username);

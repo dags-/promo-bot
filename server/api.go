@@ -11,12 +11,14 @@ import (
 	"sync"
 )
 
+var random = rand.New(rand.NewSource(8008))
+
 type Api struct {
-	lock      sync.RWMutex
-	repo      github.Repo
-	Servers   map[string]promo.Promo `json:"servers"`
-	Youtubers map[string]promo.Promo `json:"youtubers"`
-	Twitchers map[string]promo.Promo `json:"twitchers"`
+	lock    sync.RWMutex
+	repo    github.Repo
+	Server  map[string]promo.Promo `json:"server"`
+	Twitch  map[string]promo.Promo `json:"twitch"`
+	Youtube map[string]promo.Promo `json:"youtube"`
 }
 
 func newApi(repo github.Repo) *Api {
@@ -57,14 +59,14 @@ func (api *Api) GetPromoQueue() ([]promo.Promo) {
 	api.lock.Lock()
 	defer api.lock.Unlock()
 
-	promos := []promo.Promo{}
-	for _, p := range api.Servers {
+	var promos []promo.Promo
+	for _, p := range api.Server {
 		promos = append(promos, p)
 	}
-	for _, p := range api.Twitchers {
+	for _, p := range api.Twitch {
 		promos = append(promos, p)
 	}
-	for _, p := range api.Youtubers {
+	for _, p := range api.Youtube {
 		promos = append(promos, p)
 	}
 
@@ -73,7 +75,7 @@ func (api *Api) GetPromoQueue() ([]promo.Promo) {
 	}
 
 	queue := make([]promo.Promo, len(promos))
-	perm := rand.Perm(len(promos))
+	perm := random.Perm(len(promos))
 	for i, v := range perm {
 		queue[v] = promos[i]
 	}
@@ -99,14 +101,14 @@ func (api *Api) GetType(promoType string) (map[string]promo.Promo, error) {
 	defer api.lock.Unlock()
 
 	switch promoType {
-	case "servers":
-		return api.Servers, nil
-	case "youtubers":
-		return api.Youtubers, nil
-	case "twitchers":
-		return api.Twitchers, nil
+	case "server":
+		return api.Server, nil
+	case "twitch":
+		return api.Twitch, nil
+	case "youtube":
+		return api.Youtube, nil
 	default:
-		return nil, errors.New("Invalid promo type")
+		return nil, errors.New("invalid promo type")
 	}
 }
 
@@ -120,9 +122,9 @@ func (api *Api) tick() {
 		return
 	}
 
-	servers := make(map[string]promo.Promo)
-	youtubers := make(map[string]promo.Promo)
-	twitchers := make(map[string]promo.Promo)
+	server := make(map[string]promo.Promo)
+	twitch := make(map[string]promo.Promo)
+	youtube := make(map[string]promo.Promo)
 
 	for _, c := range contents {
 		resp, err := http.Get(c.URL)
@@ -137,18 +139,18 @@ func (api *Api) tick() {
 
 		switch pr.GetMeta().Type {
 		case "server":
-			servers[pr.GetMeta().ID] = pr
+			server[pr.GetMeta().ID] = pr
 			break
 		case "youtube":
-			youtubers[pr.GetMeta().ID] = pr
+			youtube[pr.GetMeta().ID] = pr
 			break
 		case "twitch":
-			twitchers[pr.GetMeta().ID] = pr
+			twitch[pr.GetMeta().ID] = pr
 			break
 		}
 	}
 
-	api.Servers = servers
-	api.Youtubers = youtubers
-	api.Twitchers = twitchers
+	api.Server = server
+	api.Youtube = youtube
+	api.Twitch = twitch
 }
