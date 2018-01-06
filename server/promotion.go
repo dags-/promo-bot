@@ -8,6 +8,7 @@ import (
 	"github.com/dags-/promo-bot/promo"
 	"github.com/qiangxue/fasthttp-routing"
 	"regexp"
+	"strings"
 )
 
 var (
@@ -48,6 +49,7 @@ func (s *Server) handleAppPost(c *routing.Context) error {
 		Discord:     getString(c, "discord"),
 		Icon:        getString(c, "icon"),
 		Description: getString(c, "description"),
+		Tags:        getTags(c, "keywords"),
 		Media: promo.Media{
 			Type: getString(c, "media-type"),
 			URL:  getString(c, "media-url"),
@@ -143,4 +145,15 @@ func (s *Server) submit(promo promo.Promo) (github.PRResponse, error) {
 	body := "This PR has been created by a promo-bot!"
 
 	return branch.CreatePR(title, body)
+}
+
+func getTags(c *routing.Context, id string) []string {
+	keywords := getString(c, id)
+	tags := strings.Split(keywords, " ")
+	for i, v := range tags {
+		if !strings.HasPrefix(v, "#") {
+			tags[i] = fmt.Sprint("#", v)
+		}
+	}
+	return tags
 }

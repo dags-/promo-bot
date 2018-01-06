@@ -12,14 +12,15 @@ type Promo interface {
 }
 
 type Meta struct {
-	ID          string `json:"id"`
-	Name        string `json:"name"`
-	Type        string `json:"type"`
-	Description string `json:"description"`
-	Icon        string `json:"icon"`
-	Website     string `json:"website"`
-	Discord     string `json:"discord"`
-	Media       Media  `json:"media"`
+	ID          string   `json:"id"`
+	Name        string   `json:"name"`
+	Type        string   `json:"type"`
+	Description string   `json:"description"`
+	Icon        string   `json:"icon"`
+	Website     string   `json:"website"`
+	Discord     string   `json:"discord"`
+	Media       Media    `json:"media"`
+	Tags        []string `json:"tags"`
 }
 
 type Media struct {

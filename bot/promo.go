@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"github.com/dags-/promo-bot/promo"
+	"strings"
 	"time"
 )
 
@@ -21,7 +22,8 @@ func (b *Bot) StartLoop() {
 					continue
 				}
 
-				b.postPromotion(pr)
+				m := buildMessage(pr)
+				b.sendToAll(m, pr)
 				h.Add(pr.GetMeta().ID)
 				time.Sleep(b.config.getInterval())
 			}
@@ -34,7 +36,27 @@ func (b *Bot) StartLoop() {
 	}()
 }
 
-func (b *Bot) postPromotion(pr promo.Promo) {
+func (b *Bot) sendToAll(m *discordgo.MessageSend, pr promo.Promo) {
+	channels := b.config.getChannels()
+	for _, ch := range channels {
+		if _, err := b.sess.Channel(ch); err != nil {
+			fmt.Println("Channel doesn't exist: ", ch)
+			b.config.removeChannel(ch)
+			continue
+		}
+
+		_, err := b.sess.ChannelMessageSendComplex(ch, m)
+		if err == nil && pr.GetMeta().Media.Type == "video" {
+			b.sess.ChannelMessageSend(ch, pr.GetMeta().Media.URL)
+		}
+
+		if err != nil {
+			fmt.Println("Post err: ", err)
+		}
+	}
+}
+
+func buildMessage(pr promo.Promo) *discordgo.MessageSend {
 	meta := pr.GetMeta()
 
 	embed := &discordgo.MessageEmbed{
@@ -42,26 +64,43 @@ func (b *Bot) postPromotion(pr promo.Promo) {
 		URL:         meta.Website,
 		Description: meta.Description,
 		Author: &discordgo.MessageEmbedAuthor{
-			URL: promo.Or(meta.Discord == "", meta.Website, meta.Discord),
+			URL:     meta.Website,
 			IconURL: meta.Icon,
 		},
 		Thumbnail: &discordgo.MessageEmbedThumbnail{
 			URL: meta.Icon,
 		},
-		Provider: &discordgo.MessageEmbedProvider{
-			Name: "promo-bot",
-		},
+		Fields: []*discordgo.MessageEmbedField{},
 	}
 
-	switch meta.Type {
+	setPromoType(embed, pr)
+	addWebsites(embed, *meta)
+	addTags(embed, *meta)
+	addMedia(embed, *meta)
+
+	return &discordgo.MessageSend{
+		Embed: embed,
+	}
+}
+
+func setPromoType(embed *discordgo.MessageEmbed, pr promo.Promo) {
+	switch pr.GetMeta().Type {
 	case "server":
 		s := pr.(*promo.Server)
 		embed.Color = 0x00d56a
 		embed.Author.Name = "#Server"
-		embed.Fields = []*discordgo.MessageEmbedField{
-			{Name: "IP", Value: s.IP, Inline: true},
-			{Name: "Whitelist", Value: promo.Or(s.Whitelist, "Yes", "No"), Inline: true},
-		}
+		embed.Fields = append(embed.Fields,
+			&discordgo.MessageEmbedField{
+				Name:   "IP",
+				Value:  fmt.Sprintf("`%s`", s.IP),
+				Inline: true,
+			},
+			&discordgo.MessageEmbedField{
+				Name:   "Whitelist",
+				Value:  promo.Or(s.Whitelist, "`Yes`", "`No`"),
+				Inline: true,
+			},
+		)
 		break
 	case "twitch":
 		embed.Color = 0x0080ff
@@ -72,36 +111,37 @@ func (b *Bot) postPromotion(pr promo.Promo) {
 		embed.Author.Name = "#Youtube"
 		break
 	}
+}
 
-	message := &discordgo.MessageSend{
-		Embed: embed,
+func addWebsites(embed *discordgo.MessageEmbed, pr promo.Meta)  {
+	if pr.Website != "" {
+		embed.Fields = append(embed.Fields, &discordgo.MessageEmbedField{
+			Name:   "Website",
+			Value:  fmt.Sprintf("[%s](%s)", pr.Website, pr.Website),
+			Inline: true,
+		})
 	}
+	if pr.Discord != "" {
+		embed.Fields = append(embed.Fields, &discordgo.MessageEmbedField{
+			Name:   "Discord",
+			Value:  fmt.Sprintf("[#Join](%s)", pr.Discord),
+			Inline: true,
+		})
+	}
+}
 
-	if meta.Media.Type == "image" {
+func addMedia(embed *discordgo.MessageEmbed, pr promo.Meta) {
+	if pr.Media.Type == "image" {
 		embed.Image = &discordgo.MessageEmbedImage{
-			URL: meta.Media.URL,
-		}
-	} else if meta.Media.Type == "video" { // video embed not working :/
-		embed.Video = &discordgo.MessageEmbedVideo{
-			URL: meta.Media.URL,
+			URL: pr.Media.URL,
 		}
 	}
+}
 
-	channels := b.config.getChannels()
-	for _, ch := range channels {
-		if _, err := b.sess.Channel(ch); err != nil {
-			fmt.Println("Channel doesn't exist: ", ch)
-			b.config.removeChannel(ch)
-			continue
-		}
-
-		_, err := b.sess.ChannelMessageSendComplex(ch, message)
-		if err == nil && meta.Media.Type == "video" {
-			b.sess.ChannelMessageSend(ch, meta.Media.URL)
-		}
-
-		if err != nil {
-			fmt.Println("Post err: ", err)
+func addTags(embed *discordgo.MessageEmbed, pr promo.Meta)  {
+	if len(pr.Tags) > 0 {
+		embed.Footer = &discordgo.MessageEmbedFooter{
+			Text:  "#" + strings.Join(pr.Tags, " #"),
 		}
 	}
 }
