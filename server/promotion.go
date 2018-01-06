@@ -151,8 +151,8 @@ func getTags(c *routing.Context, id string) []string {
 	keywords := getString(c, id)
 	tags := strings.Split(keywords, " ")
 	for i, v := range tags {
-		if !strings.HasPrefix(v, "#") {
-			tags[i] = fmt.Sprint("#", v)
+		if strings.HasPrefix(v, "#") {
+			tags[i] = v[1:]
 		}
 	}
 	return tags

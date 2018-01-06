@@ -44,8 +44,9 @@ type Twitch struct {
 
 func Read(r io.Reader) (Promo, error) {
 	var meta Meta
-	data, err := ioutil.ReadAll(r)
+	meta.Tags = []string{}
 
+	data, err := ioutil.ReadAll(r)
 	if err != nil {
 		return &meta, err
 	}
@@ -58,12 +59,15 @@ func Read(r io.Reader) (Promo, error) {
 	switch meta.Type {
 	case "server":
 		var s Server
+		s.Tags = []string{}
 		return &s, json.Unmarshal(data, &s)
 	case "twitch":
 		var t Twitch
+		t.Tags = []string{}
 		return &t, json.Unmarshal(data, &t)
 	case "youtube":
 		var y Youtube
+		y.Tags = []string{}
 		return &y, json.Unmarshal(data, &y)
 	default:
 		return &meta, errors.New("Invalid promo type: " + meta.Type)
