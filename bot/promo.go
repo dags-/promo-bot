@@ -46,10 +46,6 @@ func (b *Bot) sendToAll(m *discordgo.MessageSend, pr promo.Promo) {
 		}
 
 		_, err := b.sess.ChannelMessageSendComplex(ch, m)
-		if err == nil && pr.GetMeta().Media.Type == "video" {
-			b.sess.ChannelMessageSend(ch, pr.GetMeta().Media.URL)
-		}
-
 		if err != nil {
 			fmt.Println("Post err: ", err)
 		}
@@ -71,6 +67,9 @@ func buildMessage(pr promo.Promo) *discordgo.MessageSend {
 			URL: meta.Icon,
 		},
 		Fields: []*discordgo.MessageEmbedField{},
+		Footer: &discordgo.MessageEmbedFooter{
+			Text: "#promotion",
+		},
 	}
 
 	setPromoType(embed, pr)
@@ -79,6 +78,7 @@ func buildMessage(pr promo.Promo) *discordgo.MessageSend {
 	addMedia(embed, *meta)
 
 	return &discordgo.MessageSend{
+		Content: "` `",
 		Embed: embed,
 	}
 }
