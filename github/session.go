@@ -27,20 +27,20 @@ func NewSession(token string) Session {
 	client := github.NewClient(auth)
 	return Session{
 		Client: client,
-		Ctx: ctx,
+		Ctx:    ctx,
 	}
 }
 
 func (s *Session) NewRepo(owner, name string) (Repo) {
 	return Repo{
 		session: s,
-		owner: owner,
-		name: name,
-		ref: "master",
+		owner:   owner,
+		name:    name,
+		ref:     "master",
 	}
 }
 
-func (s *Session) do(method, path string, requestBody, responseBody interface{}) (error)  {
+func (s *Session) do(method, path string, requestBody, responseBody interface{}) (error) {
 	request, err := s.Client.NewRequest(method, path, requestBody)
 	if err != nil {
 		return err

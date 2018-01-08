@@ -21,13 +21,13 @@ func (c *Config) setInterval(i int) {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	c.Interval = i
-	write(*c)
+	write(c)
 }
 
 func (c *Config) getInterval() time.Duration {
 	c.lock.Lock()
 	defer c.lock.Unlock()
-	return time.Duration(c.Interval) * time.Minute
+	return time.Duration(c.Interval) * time.Second
 }
 
 func (c *Config) getChannels() []string {
@@ -55,39 +55,40 @@ func (c *Config) addChannel(id string) {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	c.Channels[id] = true
-	write(*c)
+	write(c)
 }
 
 func (c *Config) removeChannel(id string) {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	delete(c.Channels, id)
-	write(*c)
+	write(c)
 }
 
-func getOrCreate() Config {
+func getOrCreate() *Config {
 	var cfg Config
 	cfg.lock = &sync.RWMutex{}
+	cfg.Interval = 15
 	cfg.Channels = make(map[string]bool)
 
 	data, err := ioutil.ReadFile(config)
 	if err != nil {
 		fmt.Println(err)
-		write(cfg)
-		return cfg
+		write(&cfg)
+		return &cfg
 	}
 
 	err = json.Unmarshal(data, &cfg)
 	if err != nil {
 		fmt.Println(err)
-		write(cfg)
-		return cfg
+		write(&cfg)
+		return &cfg
 	}
 
-	return cfg
+	return &cfg
 }
 
-func write(cfg Config) {
+func write(cfg *Config) {
 	data, err := json.MarshalIndent(cfg, "", "  ")
 	if err != nil {
 		fmt.Println(err)

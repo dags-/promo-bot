@@ -11,13 +11,11 @@ import (
 	"time"
 )
 
-const apiRoute = "/Api/<type>"
-const apiIdRoute = "/Api/<type>/<id>"
-const serverCardRoute = "/sv/<id>"
-const twitchCardRoute = "/tw/<id>"
-const youtubeCardRoute = "/yt/<id>"
-const authRoute = "/auth"
 const filesRoute = "/files/*"
+const addBotRoute = "/bot"
+const apiRoute = "/api/<type>"
+const apiIdRoute = "/api/<type>/<id>"
+const authRoute = "/auth"
 const promotionRoute = "/apply"
 const promotionAuthRoute = "/apply/<auth>"
 
@@ -25,7 +23,7 @@ type Server struct {
 	session      github.Session
 	repo         github.Repo
 	auth         AuthSessions
-	Api          Api
+	Api          *Api
 	clientId     string
 	clientSecret string
 	redirectUri  string
@@ -49,26 +47,24 @@ func (s *Server) Start(port int) {
 	router := routing.New()
 	router.Get(apiRoute, s.handleApi)
 	router.Get(apiIdRoute, s.handleApi)
-	router.Get(serverCardRoute, s.handleSV)
-	router.Get(twitchCardRoute, s.handleTW)
-	router.Get(youtubeCardRoute, s.handleYT)
 	router.Get(authRoute, s.handleAuth)
 	router.Get(promotionRoute, s.redirect)
 	router.Get(promotionAuthRoute, s.handleAppGet)
 	router.Post(promotionAuthRoute, s.handleAppPost)
+	router.Get(addBotRoute, s.handleAdd)
 	router.Get(filesRoute, newFileHandler())
 
 	router.Use()
 
 	server := fasthttp.Server{
-		Handler: router.HandleRequest,
-		GetOnly: false,
-		DisableKeepalive: true,
-		ReadBufferSize: 10240,
-		WriteBufferSize: 25600,
-		ReadTimeout: time.Duration(time.Second * 2),
-		WriteTimeout: time.Duration(time.Second * 2),
-		MaxConnsPerIP: 3,
+		Handler:            router.HandleRequest,
+		GetOnly:            false,
+		DisableKeepalive:   true,
+		ReadBufferSize:     10240,
+		WriteBufferSize:    25600,
+		ReadTimeout:        time.Duration(time.Second * 2),
+		WriteTimeout:       time.Duration(time.Second * 2),
+		MaxConnsPerIP:      3,
 		MaxRequestsPerConn: 1,
 		MaxRequestBodySize: 0,
 	}
@@ -78,7 +74,7 @@ func (s *Server) Start(port int) {
 	panic(server.ListenAndServe(fmt.Sprintf(":%v", port)))
 }
 
-func newFileHandler() (func(context *routing.Context)error) {
+func newFileHandler() (func(context *routing.Context) error) {
 	prefix := strings.TrimSuffix(filesRoute, "/*")
 	split := len([]byte(prefix))
 
@@ -97,7 +93,7 @@ func newFileHandler() (func(context *routing.Context)error) {
 }
 
 func startServerLoop(s *Server) {
-	sleep := time.Duration(time.Minute * 15)
+	sleep := time.Duration(time.Minute * 5)
 	for {
 		s.Api.tick()
 		s.auth.tick()

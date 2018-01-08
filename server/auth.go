@@ -18,7 +18,7 @@ const userUrl = "https://discordapp.com/api/users/@me"
 const tokenUrl = "https://discordapp.com/api/oauth2/token"
 
 var (
-	home = template.Must(template.ParseFiles("_template/home/home.html"))
+	home = template.Must(template.ParseFiles("_template/home.html"))
 )
 
 func (s *Server) redirect(c *routing.Context) error {

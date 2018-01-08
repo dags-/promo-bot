@@ -12,13 +12,20 @@ type Promo interface {
 }
 
 type Meta struct {
-	ID          string `json:"id"`
-	Name        string `json:"name"`
-	Type        string `json:"type"`
-	Description string `json:"description"`
-	Icon        string `json:"icon"`
-	Link        string `json:"link"`
-	Media       string `json:"media"`
+	ID          string   `json:"id"`
+	Name        string   `json:"name"`
+	Type        string   `json:"type"`
+	Description string   `json:"description"`
+	Icon        string   `json:"icon"`
+	Website     string   `json:"website"`
+	Discord     string   `json:"discord"`
+	Media       Media    `json:"media"`
+	Tags        []string `json:"tags"`
+}
+
+type Media struct {
+	Type string `json:"type"`
+	URL  string `json:"url"`
 }
 
 type Server struct {
@@ -27,18 +34,19 @@ type Server struct {
 	Whitelist bool   `json:"whitelist"`
 }
 
-type Youtuber struct {
+type Youtube struct {
 	Meta
 }
 
-type Twitcher struct {
+type Twitch struct {
 	Meta
 }
 
 func Read(r io.Reader) (Promo, error) {
 	var meta Meta
-	data, err := ioutil.ReadAll(r)
+	meta.Tags = []string{}
 
+	data, err := ioutil.ReadAll(r)
 	if err != nil {
 		return &meta, err
 	}
@@ -51,13 +59,16 @@ func Read(r io.Reader) (Promo, error) {
 	switch meta.Type {
 	case "server":
 		var s Server
+		s.Tags = []string{}
 		return &s, json.Unmarshal(data, &s)
-	case "youtuber":
-		var y Youtuber
-		return &y, json.Unmarshal(data, &y)
-	case "twitcher":
-		var t Twitcher
+	case "twitch":
+		var t Twitch
+		t.Tags = []string{}
 		return &t, json.Unmarshal(data, &t)
+	case "youtube":
+		var y Youtube
+		y.Tags = []string{}
+		return &y, json.Unmarshal(data, &y)
 	default:
 		return &meta, errors.New("Invalid promo type: " + meta.Type)
 	}
@@ -71,10 +82,17 @@ func (s Server) GetMeta() (*Meta) {
 	return &s.Meta
 }
 
-func (t Twitcher) GetMeta() (*Meta) {
+func (t Twitch) GetMeta() (*Meta) {
 	return &t.Meta
 }
 
-func (y Youtuber) GetMeta() (*Meta) {
+func (y Youtube) GetMeta() (*Meta) {
 	return &y.Meta
+}
+
+func Or(exp bool, a, b string) string {
+	if exp {
+		return a
+	}
+	return b
 }

@@ -7,6 +7,12 @@ import (
 	"github.com/dags-/promo-bot/github"
 	"github.com/dags-/promo-bot/promo"
 	"github.com/qiangxue/fasthttp-routing"
+	"regexp"
+	"strings"
+)
+
+var (
+	discordmatcher = regexp.MustCompile(`(https?://)?(www\.)?(discord\.(gg|io|me|li)|discordapp\.com/invite)/.+[a-z]`)
 )
 
 func (s *Server) handleAppGet(c *routing.Context) error {
@@ -39,10 +45,15 @@ func (s *Server) handleAppPost(c *routing.Context) error {
 		ID:          id,
 		Type:        getString(c, "type"),
 		Name:        getString(c, "name"),
-		Link:        getString(c, "link"),
+		Website:     getString(c, "website"),
+		Discord:     getString(c, "discord"),
 		Icon:        getString(c, "icon"),
-		Media:       getString(c, "media"),
 		Description: getString(c, "description"),
+		Tags:        getTags(c, "keywords"),
+		Media: promo.Media{
+			Type: getString(c, "media-type"),
+			URL:  getString(c, "media-url"),
+		},
 	}
 
 	err := validate(meta)
@@ -59,24 +70,23 @@ func (s *Server) handleAppPost(c *routing.Context) error {
 		var server promo.Server
 		server.Meta = meta
 		server.IP = getString(c, "ip")
-		server.Link = getString(c, "link")
 		server.Whitelist = wl
 		p = &server
 		break
-	case "youtube":
-		var youtuber promo.Youtuber
-		youtuber.Meta = meta
-		p = &youtuber
-		break
 	case "twitch":
-		var twitcher promo.Twitcher
-		twitcher.Meta = meta
-		p = &twitcher
+		var twitch promo.Twitch
+		twitch.Meta = meta
+		p = &twitch
+		break
+	case "youtube":
+		var youtube promo.Youtube
+		youtube.Meta = meta
+		p = &youtube
 		break
 	}
 
 	if p.GetMeta().ID == "" {
-		return errors.New("No id associated with the promotion")
+		return errors.New("no id associated with the promotion")
 	}
 
 	result, err := s.submit(p)
@@ -91,19 +101,19 @@ func (s *Server) handleAppPost(c *routing.Context) error {
 
 func validate(meta promo.Meta) (error) {
 	if meta.Name == "" {
-		return errors.New("Name is required")
+		return errors.New("name is required")
 	}
 
 	if len(meta.Name) > 120 {
-		return errors.New("Name is too long")
+		return errors.New("name is too long")
 	}
 
-	if len(meta.Media) > 120 {
-		return errors.New("Media url is too long")
+	if len(meta.Description) > 480 {
+		return errors.New("description is too long")
 	}
 
-	if len(meta.Description) > 240 {
-		return errors.New("Description is too long")
+	if meta.Discord != "" && !discordmatcher.MatchString(meta.Discord) {
+		return errors.New("invalid discord link")
 	}
 
 	return nil
@@ -132,6 +142,18 @@ func (s *Server) submit(promo promo.Promo) (github.PRResponse, error) {
 	}
 
 	title := fmt.Sprint("Promo for ", promo.GetMeta().Name)
-	body := "This PR has been created by a Bot!"
+	body := "This PR has been created by a promo-bot!"
+
 	return branch.CreatePR(title, body)
+}
+
+func getTags(c *routing.Context, id string) []string {
+	keywords := getString(c, id)
+	tags := strings.Split(keywords, " ")
+	for i, v := range tags {
+		if strings.HasPrefix(v, "#") {
+			tags[i] = v[1:]
+		}
+	}
+	return tags
 }

@@ -47,10 +47,10 @@ func (b *Branch) CreateFile(file string, content []byte) (error) {
 
 	var body interface{}
 	create := FileCreate{
-		Path: path,
+		Path:    path,
 		Message: "This is a test",
 		Content: encoded,
-		Branch: b.Name,
+		Branch:  b.Name,
 	}
 
 	body = create

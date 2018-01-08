@@ -9,7 +9,7 @@ type PRCreate struct {
 	Head   string `json:"head"`
 	Base   string `json:"base"`
 	Body   string `json:"body"`
-	Modify bool `json:"maintainer_can_modify"`
+	Modify bool   `json:"maintainer_can_modify"`
 }
 
 type PRResponse struct {
@@ -24,10 +24,10 @@ func (b *Branch) CreatePR(title, comment string) (PRResponse, error) {
 	s := r.session
 	path := fmt.Sprintf("repos/%s/%s/pulls", r.owner, r.name)
 	body := PRCreate{
-		Title: title,
-		Head: b.Name,
-		Base: r.ref,
-		Body: comment,
+		Title:  title,
+		Head:   b.Name,
+		Base:   r.ref,
+		Body:   comment,
 		Modify: false,
 	}
 
