@@ -22,7 +22,7 @@ function newForm(type) {
             break;
     }
 
-    form.appendChild(input({type: "submit"}));
+    form.appendChild(input({type: "submit", method: "post"}));
 
     if (oldForm !== null) {
         content.removeChild(oldForm);
