@@ -1,90 +1,169 @@
-window.addEventListener('load', function() {
-    document.getElementById('type').addEventListener('change', onTypeChange);
-    selectType('server');
+window.addEventListener('load', function () {
+    newForm('server');
 });
 
-function onTypeChange() {
-    var index = this.selectedIndex;
-    var type = this.options[index].value;
-    selectType(type);
-}
+function newForm(type) {
+    var content = document.getElementById("content");
+    var oldForm = document.getElementById("form");
 
-function selectType(type) {
-    var details = document.getElementById('details');
-    clear(details);
+    var form = document.createElement("form");
+    form.setAttribute("id", "form");
+
+    addSelector(form, type);
+    addBody(form);
+
     switch (type) {
         case "server":
-            return showServerInput(details);
-        case "youtuber":
-            return showYoutuberInput(details);
-        case "twitcher":
-            return showTwitcherInput(details);
+            addServer(form);
+            break;
+        case "twitch":
+            break;
+        case "youtube":
+            break;
     }
+
+    form.appendChild(input({type: "submit"}));
+
+    if (oldForm !== null) {
+        content.removeChild(oldForm);
+    }
+
+    content.appendChild(form);
 }
 
-function showServerInput(div) {
-    div.appendChild(makeInput("What's the server's ip address?", 'ip', 'text'));
-    div.appendChild(makeInput("Does your server use a whitelist?", 'whitelist', 'checkbox'));
-}
+function addSelector(form, type) {
+    var label = document.createElement("label");
+    label.innerText = "What are you promoting?";
 
-function showYoutuberInput(div) {
-    // var title = makeInput("What's the name/title of your youtube channel?", 'title', 'text');
-    // var address = makeInput("What's the url of your youtube channel?", 'url', 'text');
-    // div.appendChild(title);
-    // div.appendChild(address);
-}
+    var select = document.createElement("select");
+    setProperties(select, {id: "type", name: "type"});
 
-function showTwitcherInput(div) {
-    // var username = makeInput("What's your twitch username?", 'username', 'text');
-    // var address = makeInput("What's the url for your twitch channel?", 'url', 'text');
-    // div.appendChild(username);
-    // div.appendChild(address);
-}
+    var selected = 0;
+    var options = ["server", "twitch", "youtube"];
+    for (var i = 0; i < options.length; i++) {
+        var name = options[i];
+        var option = document.createElement("option");
+        option.innerText = name;
+        select.appendChild(option);
+        if (name === type) {
+            selected = i;
+        }
+    }
 
-function makeInput(title, name, type) {
-    var label = document.createElement('label');
-    label.innerText = title;
+    select.selectedIndex = selected;
+    select.addEventListener('change', function () {
+        var type = this.options[this.selectedIndex].value;
+        newForm(type);
+    });
 
-    var input = document.createElement('input');
-    input.type = type;
-    input.name = name;
-    input.id = name;
-
-    var section = document.createElement('section');
+    var section = document.createElement("section");
     section.appendChild(label);
+    section.appendChild(select);
+
+    form.appendChild(section);
+}
+
+function addBody(form) {
+    form.appendChild(input({
+        name: "name",
+        id: "name",
+        type: "text",
+        maxlength: 120,
+        desc: "What is your server/twitch/youtube name?"
+    }));
+    form.appendChild(textArea({
+        name: "description",
+        id: "description",
+        type: "textarea",
+        maxlength: 480,
+        desc: "Describe what you're all about"
+    }));
+    form.appendChild(input({
+        name: "icon",
+        id: "icon",
+        type: "text",
+        maxlength: 240,
+        desc: "Link an icon image to accompany your promotion (optional)"
+    }));
+    form.appendChild(input({
+        name: "media",
+        id: "media",
+        type: "text",
+        maxlength: 240,
+        desc: "Link an image to accompany your promotion (optional)"
+    }));
+    form.appendChild(input({
+        name: "link",
+        id: "link",
+        type: "text",
+        maxlength: 240,
+        desc: "Got a website or discord you'd like people to visit? (optional)"
+    }));
+}
+
+function addServer(form) {
+    form.appendChild(input({
+        name: "ip",
+        id: "ip",
+        type: "text",
+        maxlength: "120",
+        desc: "What\"s the server\"s ip address?"
+    }));
+    form.appendChild(input({
+        name: "whitelist",
+        id: "whitelist",
+        type: "checkbox",
+        desc: "Does your server use a whitelist?"
+    }));
+}
+
+function input(props) {
+    var section = document.createElement("section");
+
+    if (props['desc'] !== undefined) {
+        var label = document.createElement("label");
+        label.innerText = props["desc"];
+        section.appendChild(label);
+    }
+
+    var input = document.createElement("input");
+    setProperties(input, props);
+
+    var current = document.getElementById(props['id']);
+    if (current !== null) {
+        input.innerText = current.innerText;
+        input.value = current.value;
+    }
+
     section.appendChild(input);
 
     return section;
 }
 
-function makeYesNoChecks() {
-    var yes = document.createElement('input');
-    yes.type = 'checkbox';
-    yes.name = 'whitelist.yes';
-    yes.id = 'whitelist-yes';
-    yes.checked = false;
+function textArea(props) {
+    var label = document.createElement("label");
+    label.innerText = props["desc"];
 
-    var no = document.createElement('input');
-    no.type = 'checkbox';
-    no.name = 'whitelist.no';
-    no.id = 'whitelist-no';
-    no.checked = true;
+    var text = document.createElement("textarea");
+    setProperties(text, props);
 
-    yes.addEventListener('change', function() {
-        console.log(this.value);
-        no.checked = !this.checked;
-    });
-
-    no.addEventListener('change', function() {
-        console.log(this.value);
-        yes.checked = !this.checked;
-    });
-
-    var section = document.createElement('section');
-    section.appendChild(yes);
-    section.appendChild(no);
+    var section = document.createElement("section");
+    section.appendChild(label);
+    section.appendChild(text);
 
     return section;
+}
+
+function setProperties(el, props) {
+    for (var k in props) {
+        if (k === "desc") {
+            continue;
+        }
+        if (props.hasOwnProperty(k)) {
+            var v = props[k];
+            el.setAttribute(k, v);
+        }
+    }
 }
 
 function clear(div) {
