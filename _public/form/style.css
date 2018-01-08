@@ -1,0 +1,106 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #fafafa;
+    color: #555555;
+}
+
+header {
+    display: block;
+    margin-bottom: 20px !important;
+}
+
+footer {
+    display: block;
+    width: 100%;
+    text-align: center;
+    font-size: 10px;
+}
+
+.logo {
+    display: inline-block;
+    width: 36px;
+    height: 36px;
+    transform: translateY(25%);
+    background: url('../form/icon.png') no-repeat center;
+    background-size: 36px;
+}
+
+.main {
+    display: block;
+    width: 100%;
+}
+
+.left {
+    width: 50%;
+    display: inline-block;
+}
+
+.right {
+    display: inline-block;
+    float: right;
+    width: 50%;
+    padding-top: 20px;
+    background-color: #ffffff;
+}
+
+.content {
+    width: 80%;
+    margin: 0 auto;
+}
+
+.pr-post {
+    padding: 5px;
+    max-width: 700px;
+    min-width: 200px;
+    margin: auto;
+    background-color: #fafafa;
+    border-radius: 5px;
+    border-left: 5px solid #00d56a;
+}
+
+#pr-header {
+    padding: 0;
+    margin: 0;
+    display: inline-block;
+    transform: translateY(-25%);
+}
+
+.pr-icon-col {
+    height: 100%;
+    float: right;
+    display: inline-block;
+}
+
+#pr-icon-small {
+    width: 28px;
+    border-radius: 50%;
+    display: none;
+}
+
+#pr-icon {
+    width: 80px;
+    float: right;
+    display: none;
+}
+
+#pr-image {
+    display: none;
+    margin: 5px 0;
+    width: calc(100% - 80px);
+}
+
+.pr-field {
+    display: none;
+    width: 40%;
+    min-width: 100px;
+    margin: 5px 0;
+}
+
+.pr-field-name {
+    margin: 5px 0;
+}
+
+#pr-footer {
+    display: inline-block;
+    padding: 5px 0 0 0;
+}
