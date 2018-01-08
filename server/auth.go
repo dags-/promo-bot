@@ -2,9 +2,9 @@ package server
 
 import (
 	"bytes"
-	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/dags-/promo-bot/util"
 	"github.com/qiangxue/fasthttp-routing"
 	"html/template"
 	"net/http"
@@ -61,9 +61,7 @@ func (s *Server) handleAuth(c *routing.Context) error {
 	}
 
 	var tokenAuth map[string]interface{}
-	dec := json.NewDecoder(resp.Body)
-	err2 := dec.Decode(&tokenAuth)
-	if err2 != nil {
+	if err2 := utils.DecodeJson(&tokenAuth, resp.Body); err2 != nil {
 		return err2
 	}
 
@@ -77,9 +75,7 @@ func (s *Server) handleAuth(c *routing.Context) error {
 	}
 
 	var user map[string]interface{}
-	dec = json.NewDecoder(resp.Body)
-	err4 := dec.Decode(&user)
-	if err4 != nil {
+	if err4 := utils.DecodeJson(&user, resp.Body); err4 != nil {
 		return err4
 	}
 
@@ -97,6 +93,6 @@ func (s *Server) handleAuth(c *routing.Context) error {
 	auth := strconv.FormatInt(i, 36)
 	redirect := fmt.Sprint(promotionRoute, "/", auth)
 	s.auth.setAuthenticated(auth)
-	c.Redirect(redirect, 302)
+	c.Redirect(redirect, redirectCode)
 	return nil
 }

@@ -27,8 +27,8 @@ func (s *AuthSessions) setAuthenticated(id string) {
 }
 
 func (s *AuthSessions) isAuthenticated(id string) (bool) {
-	s.lock.Lock()
-	defer s.lock.Unlock()
+	s.lock.RLock()
+	defer s.lock.RUnlock()
 	_, ok := s.sessions[id]
 	return ok
 }
@@ -46,8 +46,8 @@ func (s *AuthSessions) setRateLimited(id string) {
 }
 
 func (s *AuthSessions) isRateLimited(id string) (bool) {
-	s.lock.Lock()
-	defer s.lock.Unlock()
+	s.lock.RLock()
+	defer s.lock.RUnlock()
 
 	if timestamp, ok := s.cooldowns[id]; ok {
 		return time.Since(timestamp).Minutes() < s.timeout.Minutes()
@@ -56,21 +56,21 @@ func (s *AuthSessions) isRateLimited(id string) (bool) {
 	return false
 }
 
-func (auth *AuthSessions) tick() {
-	auth.lock.Lock()
-	defer auth.lock.Unlock()
+func (s *AuthSessions) tick() {
+	s.lock.Lock()
+	defer s.lock.Unlock()
 
-	for id, timestamp := range auth.sessions {
+	for id, timestamp := range s.sessions {
 		duration := time.Since(timestamp)
-		if duration.Minutes() > auth.timeout.Minutes() {
-			delete(auth.sessions, id)
+		if duration.Minutes() > s.timeout.Minutes() {
+			delete(s.sessions, id)
 		}
 	}
 
-	for id, timestamp := range auth.cooldowns {
+	for id, timestamp := range s.cooldowns {
 		duration := time.Since(timestamp)
-		if duration.Minutes() > auth.timeout.Minutes() {
-			delete(auth.cooldowns, id)
+		if duration.Minutes() > s.timeout.Minutes() {
+			delete(s.cooldowns, id)
 		}
 	}
 }

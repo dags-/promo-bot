@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"github.com/dags-/promo-bot/promo"
+	"github.com/dags-/promo-bot/util"
 	"strings"
 	"time"
 )
@@ -16,15 +17,15 @@ func (b *Bot) StartLoop() {
 			promos := b.api.GetPromoQueue()
 			start := time.Now()
 
-			fmt.Printf("Starting new promotions run: %v\n", len(promos))
+			fmt.Printf("Starting new promotions run, count=%v\n", len(promos))
 			for _, pr := range promos {
-				if h.Contains(pr.GetMeta().ID) {
+				if h.Contains(pr.ID) {
 					continue
 				}
 
 				m := buildMessage(pr)
 				b.sendToAll(m, pr)
-				h.Add(pr.GetMeta().ID)
+				h.Add(pr.ID)
 				time.Sleep(b.config.getInterval())
 			}
 
@@ -36,35 +37,33 @@ func (b *Bot) StartLoop() {
 	}()
 }
 
-func (b *Bot) sendToAll(m *discordgo.MessageSend, pr promo.Promo) {
+func (b *Bot) sendToAll(m *discordgo.MessageSend, pr promo.Promotion) {
 	channels := b.config.getChannels()
 	for _, ch := range channels {
 		if _, err := b.sess.Channel(ch); err != nil {
-			fmt.Println("Channel doesn't exist: ", ch)
+			fmt.Println("Err bot.sendAll.chan: Channel doesn't exist: ", ch)
 			b.config.removeChannel(ch)
 			continue
 		}
 
 		_, err := b.sess.ChannelMessageSendComplex(ch, m)
 		if err != nil {
-			fmt.Println("Post err: ", err)
+			fmt.Println("Err bot.sendAll.Send: ", err)
 		}
 	}
 }
 
-func buildMessage(pr promo.Promo) *discordgo.MessageSend {
-	meta := pr.GetMeta()
-
+func buildMessage(pr promo.Promotion) *discordgo.MessageSend {
 	embed := &discordgo.MessageEmbed{
-		Title:       meta.Name,
-		URL:         meta.Website,
-		Description: meta.Description,
+		Title:       pr.Name,
+		URL:         pr.Website,
+		Description: pr.Description,
 		Author: &discordgo.MessageEmbedAuthor{
-			URL:     meta.Website,
-			IconURL: meta.Icon,
+			URL:     pr.Website,
+			IconURL: pr.Icon,
 		},
 		Thumbnail: &discordgo.MessageEmbedThumbnail{
-			URL: meta.Icon,
+			URL: pr.Icon,
 		},
 		Fields: []*discordgo.MessageEmbedField{},
 		Footer: &discordgo.MessageEmbedFooter{
@@ -73,9 +72,9 @@ func buildMessage(pr promo.Promo) *discordgo.MessageSend {
 	}
 
 	setPromoType(embed, pr)
-	addWebsites(embed, *meta)
-	addTags(embed, *meta)
-	addMedia(embed, *meta)
+	addWebsites(embed, pr)
+	addTags(embed, pr)
+	addMedia(embed, pr)
 
 	return &discordgo.MessageSend{
 		Content: "` `",
@@ -83,21 +82,20 @@ func buildMessage(pr promo.Promo) *discordgo.MessageSend {
 	}
 }
 
-func setPromoType(embed *discordgo.MessageEmbed, pr promo.Promo) {
-	switch pr.GetMeta().Type {
+func setPromoType(embed *discordgo.MessageEmbed, pr promo.Promotion) {
+	switch pr.Type {
 	case "server":
-		s := pr.(*promo.Server)
 		embed.Color = 0x00d56a
 		embed.Author.Name = "#Server"
 		embed.Fields = append(embed.Fields,
 			&discordgo.MessageEmbedField{
 				Name:   "IP",
-				Value:  fmt.Sprintf("`%s`", s.IP),
+				Value:  fmt.Sprintf("`%s`", *pr.IP),
 				Inline: true,
 			},
 			&discordgo.MessageEmbedField{
 				Name:   "Whitelist",
-				Value:  promo.Or(s.Whitelist, "`Yes`", "`No`"),
+				Value:  utils.Or(*pr.Whitelist, "`Yes`", "`No`"),
 				Inline: true,
 			},
 		)
@@ -113,7 +111,7 @@ func setPromoType(embed *discordgo.MessageEmbed, pr promo.Promo) {
 	}
 }
 
-func addWebsites(embed *discordgo.MessageEmbed, pr promo.Meta)  {
+func addWebsites(embed *discordgo.MessageEmbed, pr promo.Promotion)  {
 	if pr.Website != "" {
 		embed.Fields = append(embed.Fields, &discordgo.MessageEmbedField{
 			Name:   "Website",
@@ -130,18 +128,19 @@ func addWebsites(embed *discordgo.MessageEmbed, pr promo.Meta)  {
 	}
 }
 
-func addMedia(embed *discordgo.MessageEmbed, pr promo.Meta) {
-	if pr.Media.Type == "image" {
+func addMedia(embed *discordgo.MessageEmbed, pr promo.Promotion) {
+	if pr.Image != "" {
 		embed.Image = &discordgo.MessageEmbedImage{
-			URL: pr.Media.URL,
+			URL: pr.Image,
 		}
 	}
 }
 
-func addTags(embed *discordgo.MessageEmbed, pr promo.Meta)  {
-	if len(pr.Tags) > 0 {
+func addTags(embed *discordgo.MessageEmbed, pr promo.Promotion)  {
+	if pr.Tags != "" {
+		tags := strings.Split(pr.Tags, " ")
 		embed.Footer = &discordgo.MessageEmbedFooter{
-			Text:  "#" + strings.Join(pr.Tags, " #"),
+			Text:  "#" + strings.Join(tags, " #"),
 		}
 	}
 }

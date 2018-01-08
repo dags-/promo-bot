@@ -1,98 +1,82 @@
 package promo
 
 import (
-	"encoding/json"
 	"errors"
-	"io"
-	"io/ioutil"
+	"github.com/dags-/promo-bot/util"
+	"github.com/qiangxue/fasthttp-routing"
+	"regexp"
 )
 
-type Promo interface {
-	GetMeta() *Meta
+var (
+	discordMatcher = regexp.MustCompile(`(https?://)?(www\.)?(discord\.(gg|io|me|li)|discordapp\.com/invite)/.+[a-z]`)
+)
+
+type Promotion struct {
+	ID          string  `json:"id"`
+	Type        string  `json:"type"`
+	Name        string  `json:"name"`
+	Description string  `json:"description"`
+	Icon        string  `json:"icon"`
+	Image       string  `json:"image"`
+	Website     string  `json:"website"`
+	Discord     string  `json:"discord"`
+	Tags        string  `json:"tags"`
+	IP          *string `json:"ip,omitempty"`
+	Whitelist   *bool   `json:"whitelist,omitempty"`
 }
 
-type Meta struct {
-	ID          string   `json:"id"`
-	Name        string   `json:"name"`
-	Type        string   `json:"type"`
-	Description string   `json:"description"`
-	Icon        string   `json:"icon"`
-	Website     string   `json:"website"`
-	Discord     string   `json:"discord"`
-	Media       Media    `json:"media"`
-	Tags        []string `json:"tags"`
+func FromForm(id string, c *routing.Context) (Promotion, error) {
+	var pr Promotion
+	pr.ID = id
+	pr.Type = utils.String(c, "type")
+	pr.Name = utils.String(c, "name")
+	pr.Description = utils.String(c, "description")
+	pr.Icon = utils.String(c, "icon")
+	pr.Image = utils.String(c, "image")
+	pr.Website = utils.String(c, "website")
+	pr.Discord = utils.String(c, "discord")
+	pr.Tags = utils.String(c, "tags")
+	pr.IP = utils.StringOp(c, "ip")
+	pr.Whitelist = utils.BoolOp(c, "whitelist")
+	return pr, Validate(pr)
 }
 
-type Media struct {
-	Type string `json:"type"`
-	URL  string `json:"url"`
-}
-
-type Server struct {
-	Meta
-	IP        string `json:"ip"`
-	Whitelist bool   `json:"whitelist"`
-}
-
-type Youtube struct {
-	Meta
-}
-
-type Twitch struct {
-	Meta
-}
-
-func Read(r io.Reader) (Promo, error) {
-	var meta Meta
-	meta.Tags = []string{}
-
-	data, err := ioutil.ReadAll(r)
-	if err != nil {
-		return &meta, err
+func Validate(pr Promotion) (error) {
+	if pr.ID == "" {
+		return errors.New("id is missing")
 	}
 
-	err = json.Unmarshal(data, &meta)
-	if err != nil {
-		return &meta, err
+	if pr.Name == "" {
+		return errors.New("name is required")
 	}
 
-	switch meta.Type {
-	case "server":
-		var s Server
-		s.Tags = []string{}
-		return &s, json.Unmarshal(data, &s)
-	case "twitch":
-		var t Twitch
-		t.Tags = []string{}
-		return &t, json.Unmarshal(data, &t)
-	case "youtube":
-		var y Youtube
-		y.Tags = []string{}
-		return &y, json.Unmarshal(data, &y)
-	default:
-		return &meta, errors.New("Invalid promo type: " + meta.Type)
+	if len(pr.Name) > 120 {
+		return errors.New("name is too long")
 	}
-}
 
-func (m *Meta) GetMeta() (*Meta) {
-	return m
-}
-
-func (s Server) GetMeta() (*Meta) {
-	return &s.Meta
-}
-
-func (t Twitch) GetMeta() (*Meta) {
-	return &t.Meta
-}
-
-func (y Youtube) GetMeta() (*Meta) {
-	return &y.Meta
-}
-
-func Or(exp bool, a, b string) string {
-	if exp {
-		return a
+	if len(pr.Description) > 480 {
+		return errors.New("description is too long")
 	}
-	return b
+
+	if len(pr.Icon) > 240 {
+		return errors.New("icon url too long")
+	}
+
+	if len(pr.Image) > 240 {
+		return errors.New("image url too long")
+	}
+
+	if len(pr.Website) > 240 {
+		return errors.New("website url too long")
+	}
+
+	if pr.Discord != "" && !discordMatcher.MatchString(pr.Discord) {
+		return errors.New("invalid discord link")
+	}
+
+	if pr.IP != nil && len(*pr.IP) > 120 {
+		return errors.New("ip address too long")
+	}
+
+	return nil
 }

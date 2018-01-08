@@ -2,7 +2,7 @@ package bot
 
 import (
 	"github.com/bwmarrin/discordgo"
-	"github.com/dags-/promo-bot/server"
+	"github.com/dags-/promo-bot/promo"
 	"os"
 )
 
@@ -14,10 +14,10 @@ type Bot struct {
 	config    *Config
 	lastPromo string
 	sess      *discordgo.Session
-	api       *server.Api
+	api       *promo.Api
 }
 
-func NewBot(a *server.Api) *Bot {
+func NewBot(a *promo.Api) *Bot {
 	return &Bot{
 		api:    a,
 		config: getOrCreate(),
