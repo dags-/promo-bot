@@ -1,6 +1,6 @@
 .content {
     width: 80%;
-    margin: auto;
+    margin: 0 auto;
 }
 
 .logo {
@@ -25,9 +25,12 @@ header {
 
 footer {
     display: block;
-    margin-top: 20px !important;
     text-align: center;
     font-size: 10px;
+}
+
+section {
+    padding-bottom: 15px;
 }
 
 input, select, textarea, input[type=checkbox] {
@@ -59,8 +62,6 @@ input[type=submit] {
     height: 50px;
     font-size: 18px;
     color: #ffffff;
-    margin-top: 20px;
-    margin-bottom: 20px;
     background-color: #26a69a;
     box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.7);
 }
@@ -78,7 +79,6 @@ input[type=submit]:active {
 label {
     display: block;
     width: 100%;
-    margin-top: 10px;
     margin-bottom: 3px;
     vertical-align: top;
 }

@@ -10,19 +10,9 @@ function newForm(type) {
     form.setAttribute("id", "form");
 
     addSelector(form, type);
-    addBody(form);
-
-    switch (type) {
-        case "server":
-            addServer(form);
-            break;
-        case "twitch":
-            break;
-        case "youtube":
-            break;
-    }
-
-    form.appendChild(input({type: "submit", method: "post"}));
+    addBody(form, type);
+    addType(form, type);
+    addSubmit(form, type);
 
     if (oldForm !== null) {
         content.removeChild(oldForm);
@@ -63,7 +53,7 @@ function addSelector(form, type) {
     form.appendChild(section);
 }
 
-function addBody(form) {
+function addBody(form, type) {
     form.appendChild(input({
         name: "name",
         id: "name",
@@ -99,6 +89,23 @@ function addBody(form) {
         maxlength: 240,
         desc: "Got a website or discord you'd like people to visit? (optional)"
     }));
+}
+
+function addType(form, type) {
+    switch (type) {
+        case "server":
+            addServer(form);
+            break;
+        case "twitch":
+            break;
+        case "youtube":
+            break;
+    }
+}
+
+function addSubmit(form, type) {
+    var submit = input({type: "submit", method: "post"});
+    form.appendChild(submit);
 }
 
 function addServer(form) {
