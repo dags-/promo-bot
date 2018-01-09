@@ -108,7 +108,7 @@ func (api *Api) Tick() {
 		}
 
 		if promos, ok := data[pr.Type]; ok {
-			promos[pr.Type] = pr
+			promos[pr.ID] = pr
 		} else {
 			fmt.Println("Err api.tick.data: invalid promo type: ", pr.Type)
 		}
