@@ -15,15 +15,11 @@ footer {
     display: block;
     width: 100%;
     text-align: center;
-    font-size: 10px;
+    font-size: 11px;
 }
 
 h2 {
     margin: 10px 2px;
-}
-
-.right h2 {
-    margin-top: 21px;
 }
 
 .logo {
@@ -33,6 +29,14 @@ h2 {
     transform: translateY(25%);
     background: url('/files/form/icon.png') no-repeat center;
     background-size: 36px;
+}
+
+.promo {
+    display: inline-block;
+}
+
+.blurb {
+    display: block;
 }
 
 .main {
@@ -52,9 +56,18 @@ h2 {
     background-color: #ffffff;
 }
 
+.right h2 {
+    margin-top: 13px;
+}
+
 .content {
     width: 80%;
     margin: 0 auto;
+}
+
+.right .content {
+    max-width: 600px;
+    min-width: 200px;
 }
 
 .pr-post {

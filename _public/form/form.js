@@ -1,258 +1,295 @@
 window.addEventListener("load", function () {
-    newForm("server");
+    updateType("server");
 });
 
-function newForm(type) {
+function updateType(type) {
     var content = document.getElementById("content");
-    var oldForm = document.getElementById("form");
-    var form = makeElement("form", {id: "form", method: "post"});
+    var current = document.getElementById("form");
+    var form = buildForm(type);
 
-    addSelector(form, type);
-    addBody(form, type);
-    addSubmit(form);
-
-    if (oldForm !== null) {
-        content.removeChild(oldForm);
+    if (current != null) {
+        content.removeChild(current);
     }
 
     content.appendChild(form);
 }
 
-function addSelector(form, type) {
-    var label = document.createElement("label");
+function buildForm(type) {
+    var preview = document.getElementById("pr-post");
+    var header = document.getElementById("pr-header");
+    var form = makeForm("form", {id: "form", method: "post"});
+
+    form.appendChild(selector(type));
+    form.appendChild(name());
+    form.appendChild(description());
+    form.appendChild(icon());
+    form.appendChild(image());
+    form.appendChild(website());
+    form.appendChild(discord());
+    form.appendChild(tags());
+
+    if (type === "server") {
+        form.appendChild(ip());
+        form.appendChild(whitelist());
+        preview.style.borderColor = "#00d56a";
+        header.innerText = "#Server";
+        document.getElementById("pr-ip-field").style.display = "inline-block";
+        document.getElementById("pr-whitelist-field").style.display = "inline-block";
+    } else {
+        document.getElementById("pr-ip-field").style.display = "none";
+        document.getElementById("pr-whitelist-field").style.display = "none";
+    }
+
+    if (type === "twitch") {
+        header.innerText = "#Twitch";
+        preview.style.borderColor = "#0080ff";
+    }
+
+    if (type === "youtube") {
+        header.innerText = "#Youtube";
+        preview.style.borderColor = "#ff8080";
+    }
+
+    return form;
+}
+
+function selector(type) {
+    var label = makeElement("label");
     label.innerText = "What are you promoting?";
 
-    var select = makeElement("select", {id: "type", name: "type"});
-
-    var selected = 0;
+    var input = makeElement("select", {id: "type", name: "type"});
     var options = ["server", "twitch", "youtube"];
     for (var i = 0; i < options.length; i++) {
         var name = options[i];
-        var option = document.createElement("option");
+        var option = makeElement("option");
         option.innerText = name;
-        select.appendChild(option);
+        input.appendChild(option);
         if (name === type) {
-            selected = i;
+            input.selectedIndex = i;
         }
     }
 
-    select.selectedIndex = selected;
-    select.addEventListener("change", function () {
-        var type = this.options[this.selectedIndex].value;
-        newForm(type);
-
-        var colors = ["#00d56a", "#0080ff", "#ff8080"];
-        var preview = document.getElementById("pr-post");
-        preview.style.borderColor = colors[this.selectedIndex];
-
-        var header = document.getElementById("pr-header");
-        header.innerText = "#" + type.charAt(0).toUpperCase() + type.slice(1);
+    input.addEventListener("change", function() {
+        var selected = this.selectedIndex;
+        var type = this.options[selected].value;
+        updateType(type);
     });
 
-    var section = document.createElement("section");
-    section.appendChild(label);
-    section.appendChild(select);
-
-    form.appendChild(section);
+    return wrap("section", label, input);
 }
 
-function addBody(form, type) {
-    form.appendChild(makeInput({
-        name: "name",
-        id: "name",
-        type: "text",
-        maxlength: 120,
-        desc: "What is your server/twitch/youtube name?"
-    }, function () {
-        var target = document.getElementById("pr-" + this.id);
+function name() {
+    var label = makeElement("label");
+    label.innerText = "What is your server/twitch/youtube name?";
+
+    var input = makeElement("input", {id: "name", name: "name", type: "text", maxlength: 120});
+    input.addEventListener("input", function() {
+        var target = document.getElementById("pr-name");
         target.innerText = this.value;
-    }));
+    });
 
-    form.appendChild(makeTextArea({
-        name: "description",
-        id: "description",
-        type: "textarea",
-        maxlength: 480,
-        desc: "Describe what you're all about"
-    }, function () {
-        var target = document.getElementById("pr-" + this.id);
+    return wrap("section", label, input);
+}
+
+function description() {
+    var label = makeElement("label");
+    label.innerText = "Describe what you're all about";
+
+    var input = makeElement("textarea", {id: "description", name: "description", maxlength: 480});
+    input.addEventListener("input", function() {
+        var target = document.getElementById("pr-description");
         target.innerText = this.value;
-    }));
+    });
 
-    form.appendChild(makeInput({
-        name: "icon",
-        id: "icon",
-        type: "text",
-        maxlength: 240,
-        desc: "Link an icon image to accompany your promotion (optional)"
-    }, function () {
-        var icon = document.getElementById("pr-icon");
-        var smallIcon = document.getElementById("pr-icon-small");
+    return wrap("section", label, input);
+}
+
+function icon() {
+    var label = makeElement("label");
+    label.innerText = "Link an icon image to accompany your promotion (optional)";
+
+    var input = makeElement("input", {id: "icon", name: "icon", type: "text", maxlength: 240});
+    input.addEventListener("input", function() {
+        var large = document.getElementById("pr-icon");
+        var small = document.getElementById("pr-icon-small");
         if (this.value === "") {
-            icon.style.display = "none";
-            smallIcon.style.display = "none";
+            large.style.display = "none";
+            small.style.display = "none";
         } else {
-            icon.style.display = "block";
-            smallIcon.style.display = "inline-block";
-            icon.src = this.value;
-            smallIcon.src = this.value;
+            large.style.display = "block";
+            small.style.display = "inline-block";
+            large.src = this.value;
+            small.src = this.value;
         }
-    }));
+    });
 
-    form.appendChild(makeInput({
-        name: "image",
-        id: "image",
-        type: "text",
-        maxlength: 240,
-        desc: "Link an image to accompany your promotion (optional)"
-    }, function () {
-        var image = document.getElementById("pr-image");
+    return wrap("section", label, input);
+}
+
+function image() {
+    var label = makeElement("label");
+    label.innerText = "Link an image to accompany your promotion (optional)";
+
+    var input = makeElement("input", {id: "image", name: "image", type: "text", maxlength: 240});
+    input.addEventListener("input", function() {
+        var target = document.getElementById("pr-image");
         if (this.value === "") {
-            image.style.display = "none";
+            target.style.display = "none";
         } else {
-            image.style.display = "block";
-            image.src = this.value;
+            target.style.display = "block";
+            target.src = this.value;
         }
-    }));
+    });
 
-    form.appendChild(makeInput({
-        name: "website",
-        id: "website",
-        type: "text",
-        maxlength: 240,
-        desc: "Got a website you'd like people to visit? (optional)"
-    }, function() {
+    return wrap("section", label, input);
+}
+
+function website() {
+    var label = makeElement("label");
+    label.innerText = "Got a website you'd like people to visit? (optional)";
+
+    var input = makeElement("input", {id: "website", name: "website", type: "text", maxlength: 120});
+    input.addEventListener("input", function () {
         var field = document.getElementById("pr-website-field");
-        var site = document.getElementById("pr-website");
+        var target = document.getElementById("pr-website");
         if (this.value === "") {
             field.style.display = "none";
         } else {
             field.style.display = "inline-block";
-            site.innerText = this.value;
-            site.href = this.value;
+            target.innerText = this.value;
+            target.href = this.value;
         }
-    }));
+    });
 
-    form.appendChild(makeInput({
-        name: "discord",
-        id: "discord",
-        type: "text",
-        maxlength: 120,
-        desc: "Got a discord you'd like people to join? (optional)"
-    }, function() {
+    return wrap("section", label, input);
+}
+
+function discord() {
+    var label = makeElement("label");
+    label.innerText = "Got a discord you'd like people to join? (optional)";
+
+    var input = makeElement("input", {id: "discord", name: "discord", type: "text", maxlength: 120});
+    input.addEventListener("input", function () {
         var field = document.getElementById("pr-discord-field");
-        var site = document.getElementById("pr-discord");
+        var target = document.getElementById("pr-discord");
         if (this.value === "") {
+            target.innerText = "#Join";
             field.style.display = "none";
         } else {
             field.style.display = "inline-block";
-            site.href = this.value;
+            target.innerText = "#Join";
+            target.href = this.value;
         }
-    }));
+    });
 
-    switch (type) {
-        case "server":
-            document.getElementById("pr-ip-field").style.display = "inline-block";
-            document.getElementById("pr-whitelist-field").style.display = "inline-block";
-            addServer(form);
-            break;
-        case "twitch":
-        case "youtube":
-            document.getElementById("pr-ip-field").style.display = "none";
-            document.getElementById("pr-whitelist-field").style.display = "none";
-            break;
-    }
+    return wrap("section", label, input);
 }
 
-function addSubmit(form) {
-    var submit = makeInput({type: "submit"});
-    form.appendChild(submit);
+function tags() {
+    var label = makeElement("label");
+    label.innerText = "Provide some comma separated keywords (optional)";
+
+    var input = makeElement("input", {id: "tags", name: "tags", type: "text", maxlength: 120});
+    input.addEventListener("input", function () {
+        var target = document.getElementById("pr-footer");
+        var split = this.value.split(",");
+        var text = "";
+        for (var i = 0; i < split.length; i++) {
+            var tag = split[i].trim();
+            if (tag === "") {
+                continue;
+            }
+            text += i > 0 ? " #" + tag.trim() : "#" + tag.trim();
+        }
+        if (text === "") {
+            target.innerText = "#promo";
+        } else {
+            target.innerText = text;
+        }
+    });
+
+    return wrap("section", label, input);
 }
 
-function addServer(form) {
-    form.appendChild(makeInput({
-        name: "ip",
-        id: "ip",
-        type: "text",
-        maxlength: "120",
-        desc: "What's the server's ip address?"
-    }, function() {
-        var ip = document.getElementById("pr-ip");
+function ip() {
+    var label = makeElement("label");
+    label.innerText = "What's the server's ip address?";
+
+    var input = makeElement("input", {id: "ip", name: "ip", type: "text", maxlength: 120});
+    input.addEventListener("input", function () {
+        var target = document.getElementById("pr-ip");
         if (this.value === "") {
-            ip.innerText = "required";
+            target.innerText = "required!";
         } else {
-            ip.innerText = this.value;
+            target.innerText = this.value;
         }
-    }));
+    });
 
-    form.appendChild(makeInput({
-        name: "whitelist",
-        id: "whitelist",
-        type: "checkbox",
-        desc: "Does your server use a whitelist?"
-    }, function () {
-        var whitelist = document.getElementById("pr-whitelist");
-        console.log(this.checked);
-        if (this.checked) {
-            whitelist.innerText = "Yes";
-        } else {
-            whitelist.innerText = "No";
-        }
-    }));
+    return wrap("section", label, input);
 }
 
-function makeInput(props, listener) {
-    var section = document.createElement("section");
+function whitelist() {
+    var label = makeElement("label");
+    label.innerText = "Does your server use a whitelist?";
 
-    if (props["desc"] !== undefined) {
-        var label = document.createElement("label");
-        label.innerText = props["desc"];
-        section.appendChild(label);
+    var input = makeElement("input", {id: "ip", name: "ip", type: "checkbox"});
+    input.addEventListener("change", function () {
+        console.log(this.checked);
+        var target = document.getElementById("pr-whitelist");
+        if (this.checked) {
+            target.innerText = "Yes";
+        } else {
+            target.innerText = "No";
+        }
+    });
+
+    return wrap("section", label, input);
+}
+
+function wrap(type) {
+    var section = document.createElement(type);
+    for (var i = 1; i < arguments.length; i++) {
+        section.appendChild(arguments[i]);
     }
-
-    var input = makeElement("input", props);
-    var event = props["type"] === "checkbox" ? "change" : "input";
-    input.addEventListener(event, listener);
-
-    var current = document.getElementById(props['id']);
-    if (current !== null) {
-        input.innerText = current.innerText;
-        input.value = current.value;
-    }
-
-    section.appendChild(input);
-
     return section;
 }
 
-function makeElement(type, props) {
+function makeForm(type, attributes) {
     var el = document.createElement(type);
-    setProperties(el, props);
+
+    for (var k in attributes) {
+        if (attributes.hasOwnProperty(k)) {
+            el.setAttribute(k, attributes[k]);
+        }
+    }
+
+    for (var i = 2; i < arguments.length; i++) {
+        el.classList.add(arguments[i]);
+    }
+
     return el;
 }
 
-function makeTextArea(props, listener) {
-    var label = document.createElement("label");
-    label.innerText = props["desc"];
+function makeElement(type, attributes) {
+    var el = document.createElement(type);
 
-    var text = makeElement("textarea", props);
-    text.addEventListener("input", listener);
-
-    var section = document.createElement("section");
-    section.appendChild(label);
-    section.appendChild(text);
-
-    return section;
-}
-
-function setProperties(el, props) {
-    for (var k in props) {
-        if (k === "desc") {
-            continue;
-        }
-        if (props.hasOwnProperty(k)) {
-            var v = props[k];
-            el.setAttribute(k, v);
+    for (var k in attributes) {
+        if (attributes.hasOwnProperty(k)) {
+            el.setAttribute(k, attributes[k]);
         }
     }
+
+    for (var i = 2; i < arguments.length; i++) {
+        el.classList.add(arguments[i]);
+    }
+
+    if (attributes !== undefined && attributes["id"] !== undefined) {
+        var current = document.getElementById(attributes["id"]);
+        if (current !== null) {
+            el.innerText = current.innerText;
+            el.value = current.value;
+        }
+    }
+
+    return el;
 }
