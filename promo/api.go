@@ -115,4 +115,5 @@ func (api *Api) Tick() {
 	}
 
 	api.data = data
+	fmt.Println("Remaining requests: ", )
 }

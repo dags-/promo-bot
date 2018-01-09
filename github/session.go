@@ -40,6 +40,14 @@ func (s *Session) NewRepo(owner, name string) (Repo) {
 	}
 }
 
+func (s *Session) RemainingRate() (int, error) {
+	rate, _, err := s.Client.RateLimits(s.Ctx)
+	if err != nil {
+		return 0, err
+	}
+	return rate.Core.Remaining, nil
+}
+
 func (s *Session) do(method, path string, requestBody, responseBody interface{}) (error) {
 	request, err := s.Client.NewRequest(method, path, requestBody)
 	if err != nil {

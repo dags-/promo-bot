@@ -97,6 +97,12 @@ func startServerLoop(s *Server) {
 	for {
 		s.Api.Tick()
 		s.auth.tick()
+		go func() {
+			r, err := s.session.RemainingRate()
+			if err == nil {
+				fmt.Println("Remaining github calls: ", r)
+			}
+		}()
 		time.Sleep(sleep)
 	}
 }

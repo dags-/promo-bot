@@ -42,6 +42,15 @@ func (s *Server) handlePost(c *routing.Context) error {
 	s.auth.dropAuthentication(id) // disallow further posts for this session
 	s.auth.setRateLimited(id)     // mark user as rate limited (can't post again for 30 mins)
 
+	r, err := s.session.RemainingRate()
+	if err != nil {
+		return err
+	}
+
+	if r < 1500 {
+		return errors.New("service is under high load, please try again in ~60mins")
+	}
+
 	if result, err := s.submit(p); err != nil {
 		return err
 	} else {
