@@ -8,6 +8,7 @@ import (
 	"github.com/qiangxue/fasthttp-routing"
 	"math/rand"
 	"net/http"
+	"strings"
 	"sync"
 )
 
@@ -91,6 +92,10 @@ func (api *Api) Tick() {
 	}
 
 	for _, c := range contents {
+		if !strings.HasSuffix(c.Name, ".json") {
+			continue
+		}
+
 		resp, err := http.Get(c.URL)
 		if err != nil {
 			continue
