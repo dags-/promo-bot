@@ -232,7 +232,7 @@ function whitelist() {
     var label = makeElement("label");
     label.innerText = "Does your server use a whitelist?";
 
-    var input = makeElement("input", {id: "ip", name: "ip", type: "checkbox"});
+    var input = makeElement("input", {id: "whitelist", name: "whitelist", type: "checkbox"});
     input.addEventListener("change", function () {
         console.log(this.checked);
         var target = document.getElementById("pr-whitelist");
