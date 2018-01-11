@@ -17,7 +17,7 @@ func (s *Server) handleGet(c *routing.Context) error {
 	}
 
 	if !s.auth.isAuthenticated(id) {
-		//return s.redirect(c)
+		return s.redirect(c)
 	}
 
 	c.Response.Header.Set("Cache-Control", "no-cache, no-store, must-revalidate")
