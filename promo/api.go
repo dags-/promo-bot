@@ -32,25 +32,20 @@ func (api *Api) HandleGet(c *routing.Context) error {
 
 	promoType := c.Param("type")
 	promoId := c.Param("id")
+
 	if promoType == "all" {
 		response = api.data
-	} else {
-		data, ok := api.data[promoType]
-		if ok {
+	} else if data, ok := api.data[promoType]; ok {
+		if promoId == "" {
 			response = data
-			if promoId != "" {
-				val, ok := data[promoId]
-				if ok {
-					response = val
-				}
-			}
+		} else if val, ok := data[promoId]; ok {
+			response = val
+		} else {
+			return errors.Errorf("no %s promo for id %s", promoType, promoId)
 		}
+	} else {
+		return errors.Errorf("unknown promo type %s", promoType)
 	}
-
-	if response == nil {
-		return errors.New(fmt.Sprint("unknown route, type: ", promoType, ", id: ", promoId))
-	}
-
 
 	c.Response.Header.SetStatusCode(http.StatusOK)
 	c.Response.Header.Set("Cache-Control", "max-age=300")
