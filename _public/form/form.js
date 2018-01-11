@@ -88,6 +88,8 @@ function buildForm(type) {
         document.getElementById("pre-website-field-name").innerText = "Channel";
     }
 
+    form.appendChild(submit());
+
     if (type === "twitch") {
         header.innerText = "#Twitch";
         preview.style.borderColor = "#0080ff";
@@ -99,6 +101,12 @@ function buildForm(type) {
     }
 
     return form;
+}
+
+function submit() {
+    var input = makeElement("input", {id: "submit", name: "submit", type: "submit"});
+    input.innerText = "Submit";
+    return wrap("section", input);
 }
 
 function selector(type) {
