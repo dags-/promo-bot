@@ -68,7 +68,7 @@ func (c *Config) removeChannel(id string) {
 func getOrCreate() *Config {
 	var cfg Config
 	cfg.lock = &sync.RWMutex{}
-	cfg.Interval = 15
+	cfg.Interval = 7200
 	cfg.Channels = make(map[string]bool)
 
 	data, err := ioutil.ReadFile(config)
