@@ -51,6 +51,11 @@ func (api *Api) HandleGet(c *routing.Context) error {
 		return errors.New(fmt.Sprint("unknown route, type: ", promoType, ", id: ", promoId))
 	}
 
+
+	c.Response.Header.SetStatusCode(http.StatusOK)
+	c.Response.Header.Set("Cache-Control", "max-age=300")
+	c.Response.Header.SetContentType("application/json; charset=UTF-8")
+
 	return utils.EncodeJson(response, c.Response.BodyWriter())
 }
 

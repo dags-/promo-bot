@@ -1,6 +1,52 @@
 window.addEventListener("load", function () {
     updateType("server");
+    loadExisting("server");
 });
+
+function loadExisting(type) {
+    var slash = window.location.href.lastIndexOf("/") + 1;
+    var id = window.location.href.substr(slash);
+    var url = "/api/" + type + "/" + id;
+    var req = new XMLHttpRequest();
+
+    req.onload = function() {
+        if (this.readyState === 4 && this.status === 200) {
+            var promo = JSON.parse(this.responseText);
+            var pid = promo["id"];
+            if (pid !== undefined && pid === id) {
+                loadPromotion(promo);
+            }
+        }
+    };
+
+    req.open("GET", url);
+    req.send();
+}
+
+function loadPromotion(promo) {
+    for (var key in promo) {
+        if (!promo.hasOwnProperty(key)) {
+            continue;
+        }
+        if (key === "type" || key === "id") {
+            continue;
+        }
+
+        var el = document.getElementById(key);
+        if (el === undefined) {
+            return;
+        }
+
+        if (key === "whitelist") {
+            el.checked = promo[key];
+            el.dispatchEvent(new Event("change"));
+        } else {
+            el.value = promo[key];
+            el.dispatchEvent(new Event("input"));
+
+        }
+    }
+}
 
 function updateType(type) {
     var content = document.getElementById("content");
@@ -234,7 +280,6 @@ function whitelist() {
 
     var input = makeElement("input", {id: "whitelist", name: "whitelist", type: "checkbox"});
     input.addEventListener("change", function () {
-        console.log(this.checked);
         var target = document.getElementById("pr-whitelist");
         if (this.checked) {
             target.innerText = "Yes";
