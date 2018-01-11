@@ -81,9 +81,11 @@ function buildForm(type) {
         header.innerText = "#Server";
         document.getElementById("pr-ip-field").style.display = "inline-block";
         document.getElementById("pr-whitelist-field").style.display = "inline-block";
+        document.getElementById("pre-website-field-name").innerText = "Website";
     } else {
         document.getElementById("pr-ip-field").style.display = "none";
         document.getElementById("pr-whitelist-field").style.display = "none";
+        document.getElementById("pre-website-field-name").innerText = "Channel";
     }
 
     if (type === "twitch") {
