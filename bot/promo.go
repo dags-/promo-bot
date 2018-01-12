@@ -95,7 +95,7 @@ func setPromoType(embed *discordgo.MessageEmbed, pr promo.Promotion) {
 			},
 			&discordgo.MessageEmbedField{
 				Name:   "Whitelist",
-				Value:  utils.Or(*pr.Whitelist, "`Yes`", "`No`"),
+				Value:  utils.Or(pr.Whitelist != nil && *pr.Whitelist, "`Yes`", "`No`"),
 				Inline: true,
 			},
 		)
