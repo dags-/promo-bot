@@ -81,10 +81,14 @@ function buildForm(type) {
         header.innerText = "#Server";
         document.getElementById("pr-ip-field").style.display = "inline-block";
         document.getElementById("pr-whitelist-field").style.display = "inline-block";
+        document.getElementById("pre-website-field-name").innerText = "Website";
     } else {
         document.getElementById("pr-ip-field").style.display = "none";
         document.getElementById("pr-whitelist-field").style.display = "none";
+        document.getElementById("pre-website-field-name").innerText = "Channel";
     }
+
+    form.appendChild(submit());
 
     if (type === "twitch") {
         header.innerText = "#Twitch";
@@ -97,6 +101,12 @@ function buildForm(type) {
     }
 
     return form;
+}
+
+function submit() {
+    var input = makeElement("input", {id: "submit", name: "submit", type: "submit"});
+    input.innerText = "Submit";
+    return wrap("section", input);
 }
 
 function selector(type) {

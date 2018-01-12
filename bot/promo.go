@@ -114,7 +114,7 @@ func setPromoType(embed *discordgo.MessageEmbed, pr promo.Promotion) {
 func addWebsites(embed *discordgo.MessageEmbed, pr promo.Promotion)  {
 	if pr.Website != "" {
 		embed.Fields = append(embed.Fields, &discordgo.MessageEmbedField{
-			Name:   "Website",
+			Name:   utils.Or(pr.Type == "server", "Website", "Channel"),
 			Value:  fmt.Sprintf("[%s](%s)", pr.Website, pr.Website),
 			Inline: true,
 		})
