@@ -22,7 +22,7 @@ func (b *Branch) CreatePR(title, comment string) (PRResponse, error) {
 
 	r := b.Repo
 	s := r.session
-	path := fmt.Sprintf("repos/%s/%s/pulls", r.owner, r.name)
+	path := fmt.Sprintf("repos/%s/%s/pulls", r.Owner, r.Name)
 	body := PRCreate{
 		Title:  title,
 		Head:   b.Name,

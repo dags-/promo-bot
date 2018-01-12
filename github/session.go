@@ -13,8 +13,8 @@ type Session struct {
 
 type Repo struct {
 	session *Session
-	owner   string
-	name    string
+	Owner   string
+	Name    string
 	ref     string
 }
 
@@ -34,8 +34,8 @@ func NewSession(token string) Session {
 func (s *Session) NewRepo(owner, name string) (Repo) {
 	return Repo{
 		session: s,
-		owner:   owner,
-		name:    name,
+		Owner:   owner,
+		Name:    name,
 		ref:     "master",
 	}
 }

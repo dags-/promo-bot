@@ -28,7 +28,7 @@ func (r *Repo) GetContents() ([]Contents, error) {
 	var contents []Contents
 
 	session := r.session
-	url := fmt.Sprintf("repos/%s/%s/contents", r.owner, r.name)
+	url := fmt.Sprintf("repos/%s/%s/contents", r.Owner, r.Name)
 	req, err := session.Client.NewRequest("GET", url, nil)
 	if err != nil {
 		return contents, err
@@ -43,7 +43,7 @@ func (b *Branch) CreateFile(file string, content []byte) (error) {
 	s := r.session
 
 	encoded := base64.StdEncoding.EncodeToString(content)
-	path := fmt.Sprintf("repos/%s/%s/contents/%s", r.owner, r.name, file)
+	path := fmt.Sprintf("repos/%s/%s/contents/%s", r.Owner, r.Name, file)
 
 	var body interface{}
 	create := FileCreate{
@@ -70,7 +70,7 @@ func (b *Branch) getFile(file string) (Contents, error) {
 	var contents Contents
 	r := b.Repo
 	s := r.session
-	path := fmt.Sprintf("repos/%s/%s/contents/%s?ref=%s", r.owner, r.name, file, b.Name)
+	path := fmt.Sprintf("repos/%s/%s/contents/%s?ref=%s", r.Owner, r.Name, file, b.Name)
 	err := s.do("GET", path, nil, &contents)
 	return contents, err
 }

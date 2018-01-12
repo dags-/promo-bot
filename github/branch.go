@@ -29,12 +29,12 @@ func (r *Repo) CreateBranch(name string) (Branch, error) {
 		return branch, nil
 	}
 
-	sha, _, err := s.Client.Repositories.GetCommitSHA1(s.Ctx, r.owner, r.name, r.ref, "")
+	sha, _, err := s.Client.Repositories.GetCommitSHA1(s.Ctx, r.Owner, r.Name, r.ref, "")
 	if err != nil {
 		return branch, err
 	}
 
-	path := fmt.Sprintf("repos/%s/%s/git/refs", r.owner, r.name)
+	path := fmt.Sprintf("repos/%s/%s/git/refs", r.Owner, r.Name)
 	body := BranchCreate{Ref: fmt.Sprintf("refs/heads/%s", name), Sha: sha}
 	err = s.do("POST", path, &body, &branch)
 
@@ -48,7 +48,7 @@ func (r *Repo) CreateBranch(name string) (Branch, error) {
 
 func (r *Repo) branchExists(name string) (BranchQuery, error) {
 	var branch BranchQuery
-	path := fmt.Sprintf("repos/%s/%s/branches/%s", r.owner, r.name, name)
+	path := fmt.Sprintf("repos/%s/%s/branches/%s", r.Owner, r.Name, name)
 	err := r.session.do("GET", path, nil, &branch)
 	if branch.Name == name {
 		return branch, nil

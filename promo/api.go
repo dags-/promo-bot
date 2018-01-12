@@ -8,7 +8,6 @@ import (
 	"github.com/qiangxue/fasthttp-routing"
 	"math/rand"
 	"net/http"
-	"strings"
 	"sync"
 )
 
@@ -76,44 +75,14 @@ func (api *Api) GetPromoQueue() ([]Promotion) {
 
 func (api *Api) Tick() {
 	fmt.Println("Updating api...")
-	api.lock.Lock()
-	defer api.lock.Unlock()
+	promos, err := GetPromotions(api.repo.Owner, api.repo.Name)
 
-	contents, err := api.repo.GetContents()
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("Error fetching promotions: ", err)
 		return
 	}
 
-	data := map[string]map[string]Promotion {
-		"server": make(map[string]Promotion),
-		"twitch": make(map[string]Promotion),
-		"youtube": make(map[string]Promotion),
-	}
-
-	for _, c := range contents {
-		if !strings.HasSuffix(c.Name, ".json") {
-			continue
-		}
-
-		resp, err := http.Get(c.URL)
-		if err != nil {
-			continue
-		}
-
-		var pr Promotion
-		if err := utils.DecodeJson(&pr, resp.Body); err != nil {
-			fmt.Println("Err api.tick.decode: ", err)
-			continue
-		}
-
-		if promos, ok := data[pr.Type]; ok {
-			promos[pr.ID] = pr
-		} else {
-			fmt.Println("Err api.tick.data: invalid promo type: ", pr.Type)
-		}
-	}
-
-	api.data = data
-	fmt.Println("Remaining requests: ", )
+	api.lock.Lock()
+	defer api.lock.Unlock()
+	api.data = promos
 }
