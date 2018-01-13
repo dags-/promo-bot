@@ -2,6 +2,7 @@ package promo
 
 import (
 	"errors"
+	"fmt"
 	"github.com/dags-/promo-bot/util"
 	"github.com/qiangxue/fasthttp-routing"
 	"regexp"
@@ -9,7 +10,10 @@ import (
 
 var (
 	discordMatcher = regexp.MustCompile(`(https?://)?(www\.)?(discord\.(gg|io|me|li)|discordapp\.com/invite)/.+[a-z]`)
-	ipMatcher = regexp.MustCompile(`^[a-zA-Z0-9:\\.]+$`)
+	websiteMatcher = regexp.MustCompile(`^((http://)|(https://)).*?`)
+	ipMatcher      = regexp.MustCompile(`^[a-zA-Z0-9:\\.]+$`)
+	urlHint        = "%s url must begin with 'http://' or 'https://'"
+	ipHint         = "%s contains invalid characters"
 )
 
 type Promotion struct {
@@ -59,30 +63,42 @@ func Validate(pr Promotion) (error) {
 		return errors.New("description is too long")
 	}
 
-	if len(pr.Icon) > 240 {
-		return errors.New("icon url too long")
+	if e := checkValid("icon", pr.Icon, urlHint, websiteMatcher, 240); e != nil {
+		return e
 	}
 
-	if len(pr.Image) > 240 {
-		return errors.New("image url too long")
+	if e := checkValid("image", pr.Image, urlHint, websiteMatcher, 240); e != nil {
+		return e
 	}
 
-	if len(pr.Website) > 240 {
-		return errors.New("website url too long")
+	if e := checkValid("website", pr.Website, urlHint, websiteMatcher, 240); e != nil {
+		return e
 	}
 
-	if pr.Discord != "" && !discordMatcher.MatchString(pr.Discord) {
-		return errors.New("invalid discord link")
+	if e := checkValid("discord", pr.Discord, urlHint, discordMatcher, 120); e != nil {
+		return e
 	}
 
 	if pr.IP != nil {
-		if len(*pr.IP) > 120 {
-			return errors.New("ip address too long")
+		if e := checkValid("ip", *pr.IP, ipHint, ipMatcher, 120); e != nil {
+			return e
 		}
+	}
 
-		if !ipMatcher.MatchString(*pr.IP) {
-			return errors.New("invalid characters in ip address")
-		}
+	return nil
+}
+
+func checkValid(name, url, hint string, match *regexp.Regexp, max int) (error) {
+	if url == "" {
+		return nil
+	}
+
+	if len(url) > max {
+		return fmt.Errorf("%s is too long", name)
+	}
+
+	if !match.MatchString(url) {
+		return fmt.Errorf(hint, name)
 	}
 
 	return nil
