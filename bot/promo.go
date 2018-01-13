@@ -57,6 +57,7 @@ func buildMessage(pr promo.Promotion) *discordgo.MessageSend {
 	embed := &discordgo.MessageEmbed{
 		Title:       pr.Name,
 		Description: pr.Description,
+		Author: &discordgo.MessageEmbedAuthor{},
 		Fields: []*discordgo.MessageEmbedField{},
 		Footer: &discordgo.MessageEmbedFooter{
 			Text: "#promotion",
@@ -105,11 +106,7 @@ func setPromoType(embed *discordgo.MessageEmbed, pr promo.Promotion) {
 
 func addWebsites(embed *discordgo.MessageEmbed, pr promo.Promotion) {
 	if pr.Website != "" {
-		if embed.Author == nil {
-			embed.Author = &discordgo.MessageEmbedAuthor{URL: pr.Website}
-		} else {
-			embed.Author.URL = pr.Website
-		}
+		embed.Author.URL = pr.Website
 
 		embed.Fields = append(embed.Fields, &discordgo.MessageEmbedField{
 			Name:   utils.Or(pr.Type == "server", "Website", "Channel"),
@@ -129,11 +126,7 @@ func addWebsites(embed *discordgo.MessageEmbed, pr promo.Promotion) {
 
 func addIcon(embed *discordgo.MessageEmbed, pr promo.Promotion) {
 	if pr.Icon != "" {
-		if embed.Author == nil {
-			embed.Author = &discordgo.MessageEmbedAuthor{IconURL: pr.Icon}
-		} else {
-			embed.Author.IconURL = pr.Icon
-		}
+		embed.Author.IconURL = pr.Icon
 	}
 }
 
