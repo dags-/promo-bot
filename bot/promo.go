@@ -127,6 +127,9 @@ func addWebsites(embed *discordgo.MessageEmbed, pr promo.Promotion) {
 func addIcon(embed *discordgo.MessageEmbed, pr promo.Promotion) {
 	if pr.Icon != "" {
 		embed.Author.IconURL = pr.Icon
+		embed.Thumbnail = &discordgo.MessageEmbedThumbnail{
+			URL: pr.Icon,
+		}
 	}
 }
 
