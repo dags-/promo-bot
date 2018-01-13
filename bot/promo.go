@@ -57,12 +57,6 @@ func buildMessage(pr promo.Promotion) *discordgo.MessageSend {
 	embed := &discordgo.MessageEmbed{
 		Title:       pr.Name,
 		Description: pr.Description,
-		Author: &discordgo.MessageEmbedAuthor{
-			IconURL: pr.Icon,
-		},
-		Thumbnail: &discordgo.MessageEmbedThumbnail{
-			URL: pr.Icon,
-		},
 		Fields: []*discordgo.MessageEmbedField{},
 		Footer: &discordgo.MessageEmbedFooter{
 			Text: "#promotion",
@@ -71,7 +65,16 @@ func buildMessage(pr promo.Promotion) *discordgo.MessageSend {
 
 	if pr.Website != "" {
 		embed.URL = pr.Website
-		embed.Author.URL = pr.Website
+		embed.Author = &discordgo.MessageEmbedAuthor{URL: pr.Website}
+	}
+
+	if pr.Icon != "" {
+		embed.Thumbnail = &discordgo.MessageEmbedThumbnail{URL: pr.Icon}
+		if embed.Author == nil {
+			embed.Author = &discordgo.MessageEmbedAuthor{IconURL: pr.Icon}
+		} else {
+			embed.Author.IconURL = pr.Icon
+		}
 	}
 
 	setPromoType(embed, pr)
@@ -113,7 +116,7 @@ func setPromoType(embed *discordgo.MessageEmbed, pr promo.Promotion) {
 	}
 }
 
-func addWebsites(embed *discordgo.MessageEmbed, pr promo.Promotion)  {
+func addWebsites(embed *discordgo.MessageEmbed, pr promo.Promotion) {
 	if pr.Website != "" {
 		embed.Fields = append(embed.Fields, &discordgo.MessageEmbedField{
 			Name:   utils.Or(pr.Type == "server", "Website", "Channel"),
@@ -138,11 +141,11 @@ func addMedia(embed *discordgo.MessageEmbed, pr promo.Promotion) {
 	}
 }
 
-func addTags(embed *discordgo.MessageEmbed, pr promo.Promotion)  {
+func addTags(embed *discordgo.MessageEmbed, pr promo.Promotion) {
 	if pr.Tags != "" {
 		tags := strings.Split(pr.Tags, " ")
 		embed.Footer = &discordgo.MessageEmbedFooter{
-			Text:  "#" + strings.Join(tags, " #"),
+			Text: "#" + strings.Join(tags, " #"),
 		}
 	}
 }
