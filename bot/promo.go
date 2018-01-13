@@ -77,7 +77,6 @@ func buildMessage(pr promo.Promotion) *discordgo.MessageSend {
 	addMedia(embed, pr)
 
 	return &discordgo.MessageSend{
-		Content: "` `",
 		Embed: embed,
 	}
 }

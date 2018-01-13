@@ -9,6 +9,7 @@ import (
 
 var (
 	discordMatcher = regexp.MustCompile(`(https?://)?(www\.)?(discord\.(gg|io|me|li)|discordapp\.com/invite)/.+[a-z]`)
+	ipMatcher = regexp.MustCompile(`^[a-zA-Z0-9:\\.]+$`)
 )
 
 type Promotion struct {
@@ -74,8 +75,14 @@ func Validate(pr Promotion) (error) {
 		return errors.New("invalid discord link")
 	}
 
-	if pr.IP != nil && len(*pr.IP) > 120 {
-		return errors.New("ip address too long")
+	if pr.IP != nil {
+		if len(*pr.IP) > 120 {
+			return errors.New("ip address too long")
+		}
+
+		if !ipMatcher.MatchString(*pr.IP) {
+			return errors.New("invalid characters in ip address")
+		}
 	}
 
 	return nil
