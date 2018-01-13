@@ -269,6 +269,7 @@ function tags() {
 
 function ip() {
     var label = makeElement("label");
+    var validator = new RegExp("^[a-zA-Z0-9.:]+$");
     label.innerText = "What's the server's ip address?";
 
     var input = makeElement("input", {id: "ip", name: "ip", type: "text", maxlength: 120});
@@ -276,8 +277,10 @@ function ip() {
         var target = document.getElementById("pr-ip");
         if (this.value === "") {
             target.innerText = "required!";
-        } else {
+        } else if (validator.test(this.value)) {
             target.innerText = this.value;
+        } else {
+            target.innerText = "invalid ip address";
         }
     });
 
