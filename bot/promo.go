@@ -106,6 +106,7 @@ func setPromoType(embed *discordgo.MessageEmbed, pr promo.Promotion) {
 
 func addWebsites(embed *discordgo.MessageEmbed, pr promo.Promotion) {
 	if pr.Website != "" {
+		embed.URL = pr.Website
 		embed.Author.URL = pr.Website
 
 		embed.Fields = append(embed.Fields, &discordgo.MessageEmbedField{
