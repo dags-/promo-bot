@@ -56,10 +56,8 @@ func (b *Bot) sendToAll(m *discordgo.MessageSend, pr promo.Promotion) {
 func buildMessage(pr promo.Promotion) *discordgo.MessageSend {
 	embed := &discordgo.MessageEmbed{
 		Title:       pr.Name,
-		URL:         pr.Website,
 		Description: pr.Description,
 		Author: &discordgo.MessageEmbedAuthor{
-			URL:     pr.Website,
 			IconURL: pr.Icon,
 		},
 		Thumbnail: &discordgo.MessageEmbedThumbnail{
@@ -69,6 +67,11 @@ func buildMessage(pr promo.Promotion) *discordgo.MessageSend {
 		Footer: &discordgo.MessageEmbedFooter{
 			Text: "#promotion",
 		},
+	}
+
+	if pr.Website != "" {
+		embed.URL = pr.Website
+		embed.Author.URL = pr.Website
 	}
 
 	setPromoType(embed, pr)
