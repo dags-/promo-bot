@@ -17,7 +17,6 @@ input, select, textarea, input[type=checkbox] {
 input[type=checkbox], input[type=checkbox]:focus {
     display: inline;
     width: 15px;
-    background-color: blue;
     box-shadow: none;
 }
 
