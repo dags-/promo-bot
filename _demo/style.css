@@ -5,7 +5,7 @@
 
 body {
     font-family: 'gross', sans-serif;
-    background: url('../_public/form/background.jpeg') no-repeat center;
+    background: url('/_public/form/background.jpeg') no-repeat center;
     background-size: cover;
     color: #555555;
     margin: 0;
@@ -52,7 +52,7 @@ h2 {
     width: 36px;
     height: 36px;
     transform: translateY(25%);
-    background: url('../_public/form/icon.png') no-repeat center;
+    background: url('/_public/form/icon.png') no-repeat center;
     background-size: 36px;
 }
 
