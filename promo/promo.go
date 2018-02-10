@@ -79,7 +79,11 @@ func Validate(pr Promotion) (error) {
 		return e
 	}
 
-	if pr.IP != nil {
+	if pr.Type == "server" {
+		if pr.IP == nil {
+			return errors.New("ip address is required")
+		}
+
 		if e := checkValid("ip", *pr.IP, ipHint, ipMatcher, 120); e != nil {
 			return e
 		}
