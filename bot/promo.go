@@ -101,6 +101,9 @@ func setPromoType(embed *discordgo.MessageEmbed, pr promo.Promotion) {
 		embed.Color = 0xff8080
 		embed.Author.Name = "#Youtube"
 		break
+	case "promo":
+		embed.Color = 0xffff80
+		embed.Author.Name = "#Promo"
 	}
 }
 
@@ -109,8 +112,21 @@ func addWebsites(embed *discordgo.MessageEmbed, pr promo.Promotion) {
 		embed.URL = pr.Website
 		embed.Author.URL = pr.Website
 
+		var title string
+		switch pr.Type {
+		case "promo":
+			title = "Apply"
+			break
+		case "server":
+			title = "Website"
+			break
+		default:
+			title = "Channel"
+			break
+		}
+
 		embed.Fields = append(embed.Fields, &discordgo.MessageEmbedField{
-			Name:   utils.Or(pr.Type == "server", "Website", "Channel"),
+			Name:   title,
 			Value:  fmt.Sprintf("[%s](%s)", pr.Website, pr.Website),
 			Inline: true,
 		})

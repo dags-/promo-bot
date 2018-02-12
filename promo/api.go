@@ -1,11 +1,13 @@
 package promo
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/dags-/promo-bot/github"
 	"github.com/dags-/promo-bot/util"
 	"github.com/pkg/errors"
 	"github.com/qiangxue/fasthttp-routing"
+	"io/ioutil"
 	"math/rand"
 	"net/http"
 	"sync"
@@ -58,6 +60,8 @@ func (api *Api) GetPromoQueue() ([]Promotion) {
 	defer api.lock.RUnlock()
 
 	var promos []Promotion
+	promos = append(promos, loadSelf())
+
 	for _, ps := range api.data {
 		for _, p := range ps {
 			promos = append(promos, p)
@@ -85,4 +89,14 @@ func (api *Api) Tick() {
 	api.lock.Lock()
 	defer api.lock.Unlock()
 	api.data = promos
+}
+
+func loadSelf() (Promotion) {
+	var self Promotion
+	data, err := ioutil.ReadFile("self.json")
+	if err != nil {
+		return self
+	}
+	json.Unmarshal(data, &self)
+	return self
 }
