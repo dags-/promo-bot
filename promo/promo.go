@@ -3,9 +3,11 @@ package promo
 import (
 	"errors"
 	"fmt"
+	"github.com/Conquest-Reforged/ping/status"
 	"github.com/dags-/promo-bot/util"
 	"github.com/qiangxue/fasthttp-routing"
 	"regexp"
+	"strings"
 )
 
 var (
@@ -14,6 +16,7 @@ var (
 	ipMatcher      = regexp.MustCompile(`^[a-zA-Z0-9:\\.]+$`)
 	urlHint        = "%s url must begin with 'http://' or 'https://'"
 	ipHint         = "%s contains invalid characters"
+	pingUrl        = "https://ping.dags.me/%s/%s"
 )
 
 type Promotion struct {
@@ -87,6 +90,10 @@ func Validate(pr Promotion) (error) {
 		if e := checkValid("ip", *pr.IP, ipHint, ipMatcher, 120); e != nil {
 			return e
 		}
+
+		if e := checkAddress(*pr.IP); e != nil {
+			return e
+		}
 	}
 
 	return nil
@@ -106,4 +113,37 @@ func checkValid(name, url, hint string, match *regexp.Regexp, max int) (error) {
 	}
 
 	return nil
+}
+
+func checkAddress(address string) error {
+	ip, port := splitAddress(address)
+	url := fmt.Sprintf(pingUrl, ip, port)
+	st, err := status.Get(url)
+
+	if err != nil {
+		return err
+	}
+
+	if st.ModInfo == nil {
+		return errors.New("no modlist available from server")
+	}
+
+	for _, m := range st.ModInfo.ModList {
+		if m.ModID == "conquest" {
+			return nil
+		}
+	}
+
+	return errors.New("the server at the provided ip address does not appear to running ConquestReforged")
+}
+
+func splitAddress(address string) (string, string) {
+	if strings.ContainsRune(address, ':') {
+		split := strings.Split(address, ":")
+		if len(split) == 2 {
+			return split[0], split[1]
+		}
+		return split[0], "25565"
+	}
+	return address, "25565"
 }

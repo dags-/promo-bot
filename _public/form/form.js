@@ -65,7 +65,7 @@ function buildForm(type) {
     var header = document.getElementById("pr-header");
     var form = makeForm("form", {id: "form", method: "post"});
 
-    form.appendChild(selector(type));
+    // form.appendChild(selector(type));
     form.appendChild(name());
     form.appendChild(description());
     form.appendChild(icon());

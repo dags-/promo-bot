@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
-	"github.com/dags-/promo-bot/bot"
 	"github.com/dags-/promo-bot/github"
 	"github.com/dags-/promo-bot/server"
 	"os"
@@ -16,39 +15,20 @@ func main() {
 	repo := flag.String("repo", "", "Github repo name")
 	clientId := flag.String("clientId", "", "Discord bot client id")
 	clientSecret := flag.String("clientSecret", "", "Discord bot client secret")
-	clientToken := flag.String("clientToken", "", "Discord bot auth token")
 	redirectUri := flag.String("redirect", "", "Discord bot redirect uri")
 	port := flag.Int("port", 8181, "The port to run the bot on")
 	flag.Parse()
 
-	if !checkFlag(ghtoken, "Github Token") {
-		return
-	}
-
-	if !checkFlag(clientId, "Client ID") {
-		return
-	}
-
-	if !checkFlag(clientSecret, "Client Secret") {
-		return
-	}
-
-	if !checkFlag(clientToken, "Client token") {
-		return
-	}
-
-	if !checkFlag(redirectUri, "Redirect URI") {
-		return
-	}
+	flag.VisitAll(func(f *flag.Flag) {
+		if f.Value.String() == "" {
+			panic(fmt.Errorf("flag not set: %s (%s)", f.Name, f.Usage))
+		}
+	})
 
 	session := github.NewSession(*ghtoken)
 	rep := session.NewRepo(*owner, *repo)
 	s := server.NewServer(session, rep, *clientId, *clientSecret, *redirectUri)
-	b := bot.NewBot(s.Api)
-
 	go s.Start(*port)
-	go b.Start(*clientToken)
-
 	handleStop()
 }
 
