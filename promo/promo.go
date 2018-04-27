@@ -6,8 +6,10 @@ import (
 	"github.com/Conquest-Reforged/ping/status"
 	"github.com/dags-/promo-bot/util"
 	"github.com/qiangxue/fasthttp-routing"
+	"net/http"
 	"regexp"
 	"strings"
+	"time"
 )
 
 var (
@@ -118,14 +120,21 @@ func checkValid(name, url, hint string, match *regexp.Regexp, max int) (error) {
 func checkAddress(address string) error {
 	ip, port := splitAddress(address)
 	url := fmt.Sprintf(pingUrl, ip, port)
-	st, err := status.Get(url)
 
+	client := http.Client{Timeout: time.Duration(5 * time.Second)}
+	rq, err := client.Get(url)
+	if err != nil {
+		return errors.New("unable to verify that server is running ConquestReforged")
+	}
+	defer rq.Body.Close()
+
+	st, err := status.Decode(rq.Body)
 	if err != nil {
 		return err
 	}
 
 	if st.ModInfo == nil {
-		return errors.New("no modlist available from server")
+		return errors.New("server does not appear to be running ConquestReforged")
 	}
 
 	for _, m := range st.ModInfo.ModList {
@@ -134,7 +143,7 @@ func checkAddress(address string) error {
 		}
 	}
 
-	return errors.New("the server at the provided ip address does not appear to running ConquestReforged")
+	return errors.New("server is not running ConquestReforged")
 }
 
 func splitAddress(address string) (string, string) {
