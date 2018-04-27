@@ -65,7 +65,7 @@ function buildForm(type) {
     var header = document.getElementById("pr-header");
     var form = makeForm("form", {id: "form", method: "post"});
 
-    // form.appendChild(selector(type));
+    form.appendChild(selector(type));
     form.appendChild(name());
     form.appendChild(description());
     form.appendChild(icon());
@@ -114,7 +114,9 @@ function selector(type) {
     label.innerText = "What are you promoting?";
 
     var input = makeElement("select", {id: "type", name: "type"});
-    var options = ["server", "twitch", "youtube"];
+    // var options = ["server", "twitch", "youtube"];
+    var options = ["server"];
+
     for (var i = 0; i < options.length; i++) {
         var name = options[i];
         var option = makeElement("option");
