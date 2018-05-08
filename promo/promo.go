@@ -22,17 +22,19 @@ var (
 )
 
 type Promotion struct {
-	ID          string  `json:"id"`
-	Type        string  `json:"type"`
-	Name        string  `json:"name"`
-	Description string  `json:"description"`
-	Icon        string  `json:"icon"`
-	Image       string  `json:"image"`
-	Website     string  `json:"website"`
-	Discord     string  `json:"discord"`
-	Tags        string  `json:"tags"`
-	IP          *string `json:"ip,omitempty"`
-	Whitelist   *bool   `json:"whitelist,omitempty"`
+	ID            string  `json:"id"`
+	Type          string  `json:"type"`
+	Name          string  `json:"name"`
+	Description   string  `json:"description"`
+	Icon          string  `json:"icon"`
+	Image         string  `json:"image"`
+	Website       string  `json:"website"`
+	Discord       string  `json:"discord"`
+	Tags          string  `json:"tags"`
+	IP            *string `json:"ip,omitempty"`
+	Whitelist     *bool   `json:"whitelist,omitempty"`
+	ServerVersion string  `json:"server_version"`
+	ModVersion    string  `json:"mod_version"`
 }
 
 func FromForm(id string, c *routing.Context) (Promotion, error) {
@@ -48,10 +50,12 @@ func FromForm(id string, c *routing.Context) (Promotion, error) {
 	pr.Tags = utils.String(c, "tags")
 	pr.IP = utils.StringOp(c, "ip")
 	pr.Whitelist = utils.BoolOp(c, "whitelist")
-	return pr, Validate(pr)
+	pr.ServerVersion = "unknown"
+	pr.ModVersion = "unknown"
+	return pr, Validate(&pr)
 }
 
-func Validate(pr Promotion) (error) {
+func Validate(pr *Promotion) (error) {
 	if pr.ID == "" {
 		return errors.New("id is missing")
 	}
@@ -93,7 +97,10 @@ func Validate(pr Promotion) (error) {
 			return e
 		}
 
-		if e := checkAddress(*pr.IP); e != nil {
+		if s, m, e := getVersionInfo(*pr.IP); e == nil {
+			pr.ServerVersion = s
+			pr.ModVersion = m
+		} else {
 			return e
 		}
 	}
@@ -117,33 +124,33 @@ func checkValid(name, url, hint string, match *regexp.Regexp, max int) (error) {
 	return nil
 }
 
-func checkAddress(address string) error {
+func getVersionInfo(address string) (string, string, error) {
 	ip, port := splitAddress(address)
 	url := fmt.Sprintf(pingUrl, ip, port)
 
 	client := http.Client{Timeout: time.Duration(5 * time.Second)}
 	rq, err := client.Get(url)
 	if err != nil {
-		return errors.New("unable to verify that server is running ConquestReforged")
+		return "unknown", "unknown", errors.New("unable to connect to server")
 	}
 	defer rq.Body.Close()
 
 	st, err := status.Decode(rq.Body)
 	if err != nil {
-		return err
+		return  "unknown", "unknown", errors.New("unable to read server status")
 	}
 
 	if st.ModInfo == nil {
-		return errors.New("server does not appear to be running ConquestReforged")
+		return st.Version.Name, "unknown", nil
 	}
 
 	for _, m := range st.ModInfo.ModList {
 		if m.ModID == "conquest" {
-			return nil
+			return st.Version.Name, m.Version, nil
 		}
 	}
 
-	return errors.New("server is not running ConquestReforged")
+	return st.Version.Name, "unknown", nil
 }
 
 func splitAddress(address string) (string, string) {

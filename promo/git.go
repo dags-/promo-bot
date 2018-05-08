@@ -60,7 +60,7 @@ func readPromotions(files []os.FileInfo, fs billy.Filesystem) (map[string]map[st
 			continue
 		}
 
-		err = Validate(pr)
+		err = Validate(&pr)
 		if err != nil {
 			fmt.Println("git.readpromos.validate: ", err)
 			continue
