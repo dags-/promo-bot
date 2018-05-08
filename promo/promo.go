@@ -129,13 +129,13 @@ func getVersionInfo(address string) (string, string, error) {
 	url := fmt.Sprintf(pingUrl, ip, port)
 
 	client := http.Client{Timeout: time.Duration(5 * time.Second)}
-	rq, err := client.Get(url)
+	resp, err := client.Get(url)
 	if err != nil {
 		return "unknown", "unknown", errors.New("unable to connect to server")
 	}
-	defer rq.Body.Close()
+	defer resp.Body.Close()
 
-	st, err := status.Decode(rq.Body)
+	st, err := status.Decode(resp.Body)
 	if err != nil {
 		return  "unknown", "unknown", errors.New("unable to read server status")
 	}
