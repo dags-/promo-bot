@@ -9,7 +9,7 @@ function loadExisting(type) {
     var url = "/api/" + type + "/" + id;
     var req = new XMLHttpRequest();
 
-    req.onload = function() {
+    req.onload = function () {
         if (this.readyState === 4 && this.status === 200) {
             var promo = JSON.parse(this.responseText);
             var pid = promo["id"];
@@ -127,7 +127,7 @@ function selector(type) {
         }
     }
 
-    input.addEventListener("change", function() {
+    input.addEventListener("change", function () {
         var selected = this.selectedIndex;
         var type = this.options[selected].value;
         updateType(type);
@@ -141,7 +141,7 @@ function name() {
     label.innerText = "What is your server/twitch/youtube name?";
 
     var input = makeElement("input", {id: "name", name: "name", type: "text", maxlength: 120});
-    input.addEventListener("input", function() {
+    input.addEventListener("input", function () {
         var target = document.getElementById("pr-name");
         target.innerText = this.value;
     });
@@ -154,7 +154,7 @@ function description() {
     label.innerText = "Describe what you're all about";
 
     var input = makeElement("textarea", {id: "description", name: "description", maxlength: 480});
-    input.addEventListener("input", function() {
+    input.addEventListener("input", function () {
         var target = document.getElementById("pr-description");
         target.innerText = this.value;
     });
@@ -167,7 +167,7 @@ function icon() {
     label.innerText = "Link an icon image to accompany your promotion (optional)";
 
     var input = makeElement("input", {id: "icon", name: "icon", type: "text", maxlength: 240});
-    input.addEventListener("input", function() {
+    input.addEventListener("input", function () {
         var large = document.getElementById("pr-icon");
         var small = document.getElementById("pr-icon-small");
         if (this.value === "") {
@@ -189,7 +189,7 @@ function image() {
     label.innerText = "Link an image to accompany your promotion (optional)";
 
     var input = makeElement("input", {id: "image", name: "image", type: "text", maxlength: 240});
-    input.addEventListener("input", function() {
+    input.addEventListener("input", function () {
         var target = document.getElementById("pr-image");
         if (this.value === "") {
             target.style.display = "none";

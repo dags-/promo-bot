@@ -2,8 +2,9 @@ package utils
 
 import (
 	"encoding/json"
-	"github.com/qiangxue/fasthttp-routing"
 	"io"
+
+	"github.com/qiangxue/fasthttp-routing"
 )
 
 func DecodeJson(i interface{}, r io.Reader) (error) {

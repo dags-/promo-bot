@@ -2,13 +2,14 @@ package promo
 
 import (
 	"fmt"
+	"os"
+	"strings"
+
 	"github.com/dags-/promo-bot/util"
 	"gopkg.in/src-d/go-billy.v4"
 	"gopkg.in/src-d/go-billy.v4/memfs"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/storage/memory"
-	"os"
-	"strings"
 )
 
 func GetPromotions(owner, repo string) (map[string]map[string]Promotion, error) {

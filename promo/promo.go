@@ -1,15 +1,17 @@
 package promo
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/Conquest-Reforged/ping/status"
-	"github.com/dags-/promo-bot/util"
-	"github.com/qiangxue/fasthttp-routing"
 	"net/http"
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/dags-/ping/status"
+	"github.com/dags-/promo-bot/util"
+	"github.com/qiangxue/fasthttp-routing"
 )
 
 var (
@@ -135,22 +137,23 @@ func getVersionInfo(address string) (string, string, error) {
 	}
 	defer resp.Body.Close()
 
-	st, err := status.Decode(resp.Body)
-	if err != nil {
-		return  "unknown", "unknown", errors.New("unable to read server status")
+	var s status.Status
+	err = json.NewDecoder(resp.Body).Decode(&s)
+	if err != nil || s.Type == "error" {
+		return "unknown", "unknown", errors.New("unable to read server status")
 	}
 
-	if st.ModInfo == nil {
-		return st.Version.Name, "unknown", nil
+	if s.Data.ModInfo == nil {
+		return s.Data.Version.Name, "unknown", nil
 	}
 
-	for _, m := range st.ModInfo.ModList {
+	for _, m := range s.Data.ModInfo.ModList {
 		if m.ModID == "conquest" {
-			return st.Version.Name, m.Version, nil
+			return s.Data.Version.Name, m.Version, nil
 		}
 	}
 
-	return st.Version.Name, "unknown", nil
+	return s.Data.Version.Name, "unknown", nil
 }
 
 func splitAddress(address string) (string, string) {

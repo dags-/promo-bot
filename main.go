@@ -4,9 +4,10 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
+	"os"
+
 	"github.com/dags-/promo-bot/github"
 	"github.com/dags-/promo-bot/server"
-	"os"
 )
 
 func main() {

@@ -3,14 +3,15 @@ package promo
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/dags-/promo-bot/github"
-	"github.com/dags-/promo-bot/util"
-	"github.com/pkg/errors"
-	"github.com/qiangxue/fasthttp-routing"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
 	"sync"
+
+	"github.com/dags-/promo-bot/github"
+	"github.com/dags-/promo-bot/util"
+	"github.com/pkg/errors"
+	"github.com/qiangxue/fasthttp-routing"
 )
 
 type Api struct {

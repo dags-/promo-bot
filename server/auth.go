@@ -4,13 +4,14 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/dags-/promo-bot/util"
-	"github.com/qiangxue/fasthttp-routing"
 	"html/template"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
+
+	"github.com/dags-/promo-bot/util"
+	"github.com/qiangxue/fasthttp-routing"
 )
 
 const authUrl = "https://discordapp.com/oauth2/authorize"

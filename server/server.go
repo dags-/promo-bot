@@ -2,12 +2,13 @@ package server
 
 import (
 	"fmt"
+	"strings"
+	"time"
+
 	"github.com/dags-/promo-bot/github"
 	"github.com/dags-/promo-bot/promo"
 	"github.com/qiangxue/fasthttp-routing"
 	"github.com/valyala/fasthttp"
-	"strings"
-	"time"
 )
 
 const redirectCode = 301

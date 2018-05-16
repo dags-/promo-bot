@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+
 	"github.com/dags-/promo-bot/github"
 	"github.com/dags-/promo-bot/promo"
 	"github.com/dags-/promo-bot/util"
